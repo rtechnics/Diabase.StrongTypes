@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.2.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Templates\StrongBoolType.cs" />
+    <Compile Remove="Templates\StrongDateType.cs" />
+    <Compile Remove="Templates\StrongFloatType.cs" />
+    <Compile Remove="Templates\StrongIntType.cs" />
+    <Compile Remove="Templates\StrongReferenceId.cs" />
+    <Compile Remove="Templates\StrongStringType.cs" />
+    <Compile Remove="Templates\StrongValueId.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\StrongBoolType.cs" />
+    <EmbeddedResource Include="Templates\StrongDateType.cs" />
+    <EmbeddedResource Include="Templates\StrongFloatType.cs" />
+    <EmbeddedResource Include="Templates\StrongIntType.cs" />
+    <EmbeddedResource Include="Templates\StrongReferenceId.cs" />
+    <EmbeddedResource Include="Templates\StrongStringType.cs" />
+    <EmbeddedResource Include="Templates\StrongValueId.cs" />
+  </ItemGroup>
+
+</Project>
