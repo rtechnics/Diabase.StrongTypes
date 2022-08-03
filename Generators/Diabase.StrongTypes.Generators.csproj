@@ -3,6 +3,7 @@
   <PropertyGroup>
 	  <TargetFramework>netstandard2.0</TargetFramework>
 	  <LangVersion>9.0</LangVersion>
+	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Generators", ""))</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <Compile Remove="Templates\StrongBoolType.cs" />
+    <Compile Remove="Templates\StrongBytesSizeUnit.cs" />
     <Compile Remove="Templates\StrongDateType.cs" />
     <Compile Remove="Templates\StrongFloatType.cs" />
     <Compile Remove="Templates\StrongIntType.cs" />
@@ -30,6 +32,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Templates\StrongBoolType.cs" />
+    <EmbeddedResource Include="Templates\StrongBytesSizeUnit.cs" />
     <EmbeddedResource Include="Templates\StrongDateType.cs" />
     <EmbeddedResource Include="Templates\StrongFloatType.cs" />
     <EmbeddedResource Include="Templates\StrongIntType.cs" />

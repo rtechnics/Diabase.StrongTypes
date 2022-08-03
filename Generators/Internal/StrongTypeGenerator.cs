@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿//#define DEBUG_GENERATOR
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
@@ -45,7 +47,7 @@ namespace Diabase.StrongTypes.Generators.Internal
         string GenerateCode(Entry entry)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = $"Diabase.StrongTypes.Generators.Templates.{entry.Parameters.TemplateName}.cs";
+            var resourceName = $"Diabase.StrongTypes.Templates.{entry.Parameters.TemplateName}.cs";
 
             string template;
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
@@ -121,6 +123,7 @@ namespace Diabase.StrongTypes.Generators.Internal
         const string StrongBoolTypeTemplate = "StrongBoolType";
         const string StrongReferenceIdTemplate = "StrongReferenceId";
         const string StrongValueIdTemplate = "StrongValueId";
+        const string StrongBytesSizeUnit = "StrongBytesSizeUnit";
 
         static List<(string AttributeName, string TemplateName, string BackingTypeName)> generatorList = new()
         {
@@ -136,6 +139,9 @@ namespace Diabase.StrongTypes.Generators.Internal
             (typeof(StrongStringIdAttribute).FullName, StrongReferenceIdTemplate, typeof(string).Name),
             (typeof(StrongGuidIdAttribute).FullName, StrongValueIdTemplate, typeof(Guid).Name),
             (typeof(StrongIntIdAttribute).FullName, StrongValueIdTemplate, typeof(int).Name),
+
+            (typeof(StrongBytesSizeUnitAttribute).FullName, StrongBytesSizeUnit, typeof(decimal).Name),
+
         };
 
         public static Dictionary<string, (string AttributeName, string TemplateName, string BackingTypeName)> generatorMap = generatorList.ToDictionary(x => x.AttributeName, x => x);
