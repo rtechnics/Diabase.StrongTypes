@@ -4,12 +4,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Diabase.StrongTypes.Generators.Internal
 {
@@ -129,6 +126,7 @@ namespace Diabase.StrongTypes.Generators.Internal
         {
             (typeof(StrongStringTypeAttribute).FullName, StrongStringTypeTemplate, typeof(string).Name),
             (typeof(StrongIntTypeAttribute).FullName, StrongIntTypeTemplate, typeof(int).Name),
+            (typeof(StrongLongTypeAttribute).FullName, StrongIntTypeTemplate, typeof(long).Name),
             (typeof(StrongDoubleTypeAttribute).FullName, StrongFloatTypeTemplate, typeof(double).Name),
             (typeof(StrongFloatTypeAttribute).FullName, StrongFloatTypeTemplate, typeof(float).Name),
             (typeof(StrongDecimalTypeAttribute).FullName, StrongFloatTypeTemplate, typeof(decimal).Name),
