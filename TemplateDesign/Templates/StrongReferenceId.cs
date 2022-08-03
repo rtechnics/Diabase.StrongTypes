@@ -27,7 +27,7 @@ namespace Diabase.StrongTypes.Templates
     [JsonConverter(typeof(ThisJsonConverter))]
 #endif
 #if INCLUDE_TYPE_CONVERTER
-    [TypeConverter(typeof(ThisJsonConverter))]
+    [TypeConverter(typeof(ThisTypeConverter))]
 #endif
     internal readonly partial struct StrongReferenceId : IEquatable<StrongReferenceId>, IComparable<StrongReferenceId>, IComparable, IConvertible
     {
