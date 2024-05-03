@@ -1,9 +1,12 @@
-﻿//#define DEBUG_GENERATOR
+﻿//#define INTEGRATED_DEBUGGING // use this for integrated debugging
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+#if INTEGRATED_DEBUGGING
+using System.Diagnostics;
+#endif
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,17 +18,20 @@ namespace Diabase.StrongTypes.Generators.Internal
     {
         public void Execute(GeneratorExecutionContext context)
         {
-            SyntaxReceiver rx = (SyntaxReceiver)context.SyntaxContextReceiver!;
-            foreach (var entry in rx.Entries)
+            SyntaxReceiver syntaxReceiver = (SyntaxReceiver)context.SyntaxContextReceiver!;
+
+            // Generate code for each class and struct that has a StrongType attribute
+            foreach (var entry in syntaxReceiver.Entries)
             {
+                string filename = $"StrongType_{entry.NamespaceIdentifier}_{entry.TypeIdentifier}.g.cs";
                 string source = GenerateCode(entry);
-                context.AddSource($"StrongType_{entry.NamespaceIdentifier}_{entry.StructIdentifier}.g.cs", source);
+                context.AddSource(filename, source);
             }
         }
 
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG_GENERATOR
+#if INTEGRATED_DEBUGGING
             if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
@@ -34,24 +40,30 @@ namespace Diabase.StrongTypes.Generators.Internal
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
         }
 
-        Dictionary<ImplicitNullConversionMode, string> implicitConversionModeSuffix = new()
+        // Value options for the ImplicitNullConversionMode parameter of a StrongType attribute
+        readonly Dictionary<ImplicitNullConversionMode, string> implicitConversionModeSuffix = new()
         {
             { ImplicitNullConversionMode.NotAllowed, "NONE" },
             { ImplicitNullConversionMode.ToEmptyString, "EMPTY" },
             { ImplicitNullConversionMode.ToNullValue, "NULL" },
         };
 
+        // Generates the partial class source code for a class or struct entry
         string GenerateCode(Entry entry)
         {
+            // Get template code from embedded resources
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = $"Diabase.StrongTypes.Templates.{entry.Parameters.TemplateName}.cs";
-
             string template;
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             using (StreamReader reader = new(stream))
             {
                 template = reader.ReadToEnd();
             }
+
+            // Functional transformations to apply to the template based on entry parameters
+            // This is done by, primarily, removing code by undefining preprocessor directives
+            // There are a few keyword replacements as well
             Func<string, string>[] transformations =
             {
                 (s) => s.RemoveLinesStartingWith("using BackingType = "),
@@ -69,24 +81,12 @@ namespace Diabase.StrongTypes.Generators.Internal
                 (s) => entry.Parameters.Converters?.Contains(Converter.Customize)??false ? s : s.Undefine("USE_CUSTOM_CONVERTER"),
                 (s) => s.Replace("internal", "public"),
                 (s) => s.Replace("Diabase.StrongTypes.Templates", entry.NamespaceIdentifier),
-                (s) => s.Replace(entry.Parameters.TemplateName, entry.StructIdentifier),
-                (s) => s.Replace("BackingType", entry.Parameters.BackingType),
+                (s) => s.Replace(entry.Parameters.TemplateName, entry.TypeIdentifier),
+                (s) => s.Replace("BackingType", entry.Parameters.BackingTypeName),
             };
-
-            var code = transformations.Aggregate(template, (acc, transformation) => transformation(acc));
+            string code = transformations.Aggregate(template, (acc, transformation) => transformation(acc));
 
             return code;
-        }
-
-        struct BackingInfo
-        {
-            public BackingInfo(string typeText, string templateName)
-            {
-                TypeText = typeText;
-                TemplateName = templateName;
-            }
-            public string TypeText;
-            public string TemplateName;
         }
 
         const string StrongBoolType = nameof(StrongBoolType);
@@ -94,18 +94,19 @@ namespace Diabase.StrongTypes.Generators.Internal
         const string StrongIntType = nameof(StrongIntType);
         const string StrongStringType = nameof(StrongStringType);
 
+        // Each entry represents a class or struct that will need to have a strong type partial class generated
         struct Entry
         {
             public string NamespaceIdentifier;
-            public string StructIdentifier;
+            public string TypeIdentifier;
             public Parameters Parameters;
         }
 
+        // These parameters specify which features should be enabled in the generated code
         struct Parameters
         {
-            public bool IsStrongType;
             public string TemplateName;
-            public string BackingType;
+            public string BackingTypeName;
             public ImplicitNullConversionMode ImplicitNullConversionMode;
             public StringConstraint[] StringConstraints;
             public NumericConstraint[] NumericConstraints;
@@ -122,7 +123,8 @@ namespace Diabase.StrongTypes.Generators.Internal
         const string StrongValueIdTemplate = "StrongValueId";
         const string StrongBytesSizeUnit = "StrongBytesSizeUnit";
 
-        static List<(string AttributeName, string TemplateName, string BackingTypeName)> generatorList = new()
+        // Map attribute names to template names and backing types
+        static readonly List<(string AttributeName, string TemplateName, string BackingTypeName)> generatorList = new()
         {
             (typeof(StrongStringTypeAttribute).FullName, StrongStringTypeTemplate, typeof(string).Name),
             (typeof(StrongIntTypeAttribute).FullName, StrongIntTypeTemplate, typeof(int).Name),
@@ -146,8 +148,15 @@ namespace Diabase.StrongTypes.Generators.Internal
 
         class SyntaxReceiver : ISyntaxContextReceiver
         {
-            public List<Entry> Entries = new();
-            string namespaceIdentifier;
+            // Names of parameters and values in the StrongType attribute
+            private const string implicitNullConversionMode = "ImplicitNullConversionMode";
+            private const string constraints = "Constraints";
+            private const string converters = "Converters";
+            private const string validationRequired = "ValidationRequired";
+            private const string booleanTrue = "true";
+
+            public List<Entry> Entries = new(); // List of classes and structs that have the StrongType attribute
+            string namespaceIdentifier; // The namespace of the current class or struct being parsed
 
             (StringConstraint? StringConstraint, NumericConstraint? NumericConstraint) ParseConstraint(string constraintValue)
             {
@@ -156,10 +165,8 @@ namespace Diabase.StrongTypes.Generators.Internal
                 return (stringConstraint, numericConstraint);
             }
 
-            Parameters GetParams(GeneratorSyntaxContext context, SyntaxList<AttributeListSyntax> list)
+            Parameters? GetParams(GeneratorSyntaxContext context, SyntaxList<AttributeListSyntax> list)
             {
-                Parameters result = new();
-
                 var attributeEntries = list.SelectMany(x => x.Attributes);
                 var namedAttributeEntries = attributeEntries.Select(attribute =>
                     new {
@@ -169,48 +176,56 @@ namespace Diabase.StrongTypes.Generators.Internal
                 var supportedAttributes = namedAttributeEntries.Where(x => generatorMap.ContainsKey(x.Name));
                 var attributeEntry = supportedAttributes.FirstOrDefault();
 
-                if (attributeEntry is not null)
+                if (attributeEntry is null)
                 {
-                    result.IsStrongType = true;
+                    return null; // this class or struct does not have a StrongType attribute
+                }
 
-                    var generatorInfo = generatorMap[attributeEntry.Name];
-                    result.BackingType = generatorInfo.BackingTypeName;
-                    result.TemplateName = generatorInfo.TemplateName;
+                Parameters result = new();
 
-                    if (attributeEntry.Value.ArgumentList is not null)
+                var generatorInfo = generatorMap[attributeEntry.Name];
+                result.BackingTypeName = generatorInfo.BackingTypeName;
+                result.TemplateName = generatorInfo.TemplateName;
+
+                if (attributeEntry.Value.ArgumentList is not null)
+                {
+                    foreach (AttributeArgumentSyntax attributeArgumentSyntax in attributeEntry.Value.ArgumentList.Arguments)
                     {
-                        foreach (AttributeArgumentSyntax attributeArgumentSyntax in attributeEntry.Value.ArgumentList.Arguments)
+                        if (attributeArgumentSyntax.NameEquals is not null)
                         {
-                            if (attributeArgumentSyntax.NameEquals is not null)
+                            var argumentName = attributeArgumentSyntax.NameEquals.Name.Identifier.Text;
+                            var expression = attributeArgumentSyntax.Expression.ToString();
+                            switch (argumentName)
                             {
-                                var argumentName = attributeArgumentSyntax.NameEquals.Name.Identifier.Text;
-                                //var expression = attributeArgumentSyntax.Expression.ToString().Split('.').Last();
-                                var expression = attributeArgumentSyntax.Expression.ToString();
-                                if (attributeArgumentSyntax.NameEquals.Name.Identifier.Text == "ImplicitNullConversionMode")
-                                {
-                                    var enumIdentifier = attributeArgumentSyntax.Expression.ToString().Split('.').Last();
-                                    if (Enum.TryParse<ImplicitNullConversionMode>(enumIdentifier, out var implicitNullConversionMode))
+                                case implicitNullConversionMode:
                                     {
-                                        result.ImplicitNullConversionMode = implicitNullConversionMode;
+                                        var enumIdentifier = attributeArgumentSyntax.Expression.ToString().Split('.').Last();
+                                        if (Enum.TryParse<ImplicitNullConversionMode>(enumIdentifier, out var implicitNullConversionMode))
+                                        {
+                                            result.ImplicitNullConversionMode = implicitNullConversionMode;
+                                        }
+                                        break;
                                     }
-                                }
-                                else if (argumentName == "Constraints")
-                                {
-                                    var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
-                                    var enums = enumsExpressions.Select(enumExpression => ParseConstraint(enumExpression));
-                                    result.StringConstraints = enums.Where(x => x.StringConstraint is not null).Select(x => x.StringConstraint.Value).ToArray();
-                                    result.NumericConstraints = enums.Where(x => x.NumericConstraint is not null).Select(x => x.NumericConstraint.Value).ToArray();
-                                }
-                                else if (argumentName == "Converters")
-                                {
-                                    var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
-                                    var enums = enumsExpressions.Select(enumExpression => (Converter)Enum.Parse(typeof(Converter), enumExpression));
-                                    result.Converters = enums.ToArray();
-                                }
-                                else if (argumentName == "ValidationRequired")
-                                {
-                                    result.ValidationRequired = expression == "true";
-                                }
+                                case constraints:
+                                    {
+                                        var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
+                                        var enums = enumsExpressions.Select(enumExpression => ParseConstraint(enumExpression));
+                                        result.StringConstraints = enums.Where(x => x.StringConstraint is not null).Select(x => x.StringConstraint.Value).ToArray();
+                                        result.NumericConstraints = enums.Where(x => x.NumericConstraint is not null).Select(x => x.NumericConstraint.Value).ToArray();
+                                        break;
+                                    }
+                                case converters:
+                                    {
+                                        var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
+                                        var enums = enumsExpressions.Select(enumExpression => (Converter)Enum.Parse(typeof(Converter), enumExpression));
+                                        result.Converters = enums.ToArray();
+                                        break;
+                                    }
+                                case validationRequired:
+                                    {
+                                        result.ValidationRequired = expression == booleanTrue;
+                                        break;
+                                    }
                             }
                         }
                     }
@@ -221,43 +236,52 @@ namespace Diabase.StrongTypes.Generators.Internal
 
             public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
             {
-                if (context.Node is NamespaceDeclarationSyntax namespaceDecl)
+                switch (context.Node)
                 {
-                    namespaceIdentifier = namespaceDecl.Name.ToString();
-                }
-                else if (context.Node is AttributeSyntax attrib)
-                {
-                    var attributeName = context.SemanticModel.GetTypeInfo(attrib).Type?.ToDisplayString();
-                }
-                else if (context.Node is StructDeclarationSyntax structdecl)
-                {
-                    var attributeParams = GetParams(context, structdecl.AttributeLists);
-                    if (attributeParams.IsStrongType)
-                    {
-                        var identifier = structdecl.Identifier.Text;
-                        var entry = new Entry
+                    case NamespaceDeclarationSyntax namespaceDecl:
                         {
-                            NamespaceIdentifier = namespaceIdentifier,
-                            StructIdentifier = identifier,
-                            Parameters = attributeParams,
-                        };
-                        Entries.Add(entry);
-                    }
-                }
-                else if (context.Node is ClassDeclarationSyntax classdecl)
-                {
-                    var attributeParams = GetParams(context, classdecl.AttributeLists);
-                    if (attributeParams.IsStrongType)
-                    {
-                        var identifier = classdecl.Identifier.Text;
-                        var entry = new Entry
+                            namespaceIdentifier = namespaceDecl.Name.ToString();
+                        }
+                        break;
+#if false // for testing
+                    case AttributeSyntax attrib:
                         {
-                            NamespaceIdentifier = namespaceIdentifier,
-                            StructIdentifier = identifier,
-                            Parameters = attributeParams,
-                        };
-                        Entries.Add(entry);
-                    }
+                            var attributeName = context.SemanticModel.GetTypeInfo(attrib).Type?.ToDisplayString();
+                        }
+                        break;
+#endif
+                    case StructDeclarationSyntax structdecl:
+                        {
+                            var attributeParams = GetParams(context, structdecl.AttributeLists);
+                            if (attributeParams is not null)
+                            {
+                                var identifier = structdecl.Identifier.Text;
+                                var entry = new Entry
+                                {
+                                    NamespaceIdentifier = namespaceIdentifier,
+                                    TypeIdentifier = identifier,
+                                    Parameters = attributeParams.Value,
+                                };
+                                Entries.Add(entry);
+                            }
+                        }
+                        break;
+                    case ClassDeclarationSyntax classdecl:
+                        {
+                            var attributeParams = GetParams(context, classdecl.AttributeLists);
+                            if (attributeParams is not null)
+                            {
+                                var identifier = classdecl.Identifier.Text;
+                                var entry = new Entry
+                                {
+                                    NamespaceIdentifier = namespaceIdentifier,
+                                    TypeIdentifier = identifier,
+                                    Parameters = attributeParams.Value,
+                                };
+                                Entries.Add(entry);
+                            }
+                        }
+                        break;
                 }
             }
         }
