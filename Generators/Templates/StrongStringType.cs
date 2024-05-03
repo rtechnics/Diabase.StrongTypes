@@ -215,7 +215,11 @@ namespace Diabase.StrongTypes.Templates
         public uint ToUInt32(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, uint>(value, provider);
         public ulong ToUInt64(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, ulong>(value, provider);
 
+#if VALIDATION_REQUIRED
+        public static StrongStringType Empty => new();
+#else
         public static readonly StrongStringType Empty = new();
+#endif
         public bool IsEmpty => string.IsNullOrEmpty(value);
         public bool IsNotEmpty => !string.IsNullOrEmpty(value);
 

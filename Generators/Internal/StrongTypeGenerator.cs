@@ -48,7 +48,7 @@ namespace Diabase.StrongTypes.Generators.Internal
 
             string template;
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
+            using (StreamReader reader = new(stream))
             {
                 template = reader.ReadToEnd();
             }
@@ -160,25 +160,26 @@ namespace Diabase.StrongTypes.Generators.Internal
             {
                 Parameters result = new();
 
-                var attributeEntries = list.Aggregate(
-                    new List<AttributeSyntax>().AsEnumerable(),
-                    (acc, list) => acc.Concat(list.Attributes))
-                    .Select(attribute => new { attribute, attributeName = context.SemanticModel.GetTypeInfo(attribute).Type?.ToDisplayString() })
-                    .Where(x => generatorMap.ContainsKey(x.attributeName));
-
-                var attributeEntry = attributeEntries.FirstOrDefault();
+                var attributeEntries = list.SelectMany(x => x.Attributes);
+                var namedAttributeEntries = attributeEntries.Select(attribute =>
+                    new {
+                        Name = context.SemanticModel.GetTypeInfo(attribute).Type?.ToDisplayString(),
+                        Value = attribute
+                    });
+                var supportedAttributes = namedAttributeEntries.Where(x => generatorMap.ContainsKey(x.Name));
+                var attributeEntry = supportedAttributes.FirstOrDefault();
 
                 if (attributeEntry is not null)
                 {
                     result.IsStrongType = true;
 
-                    var generatorInfo = generatorMap[attributeEntry.attributeName];
+                    var generatorInfo = generatorMap[attributeEntry.Name];
                     result.BackingType = generatorInfo.BackingTypeName;
                     result.TemplateName = generatorInfo.TemplateName;
 
-                    if (attributeEntry.attribute.ArgumentList is not null)
+                    if (attributeEntry.Value.ArgumentList is not null)
                     {
-                        foreach (AttributeArgumentSyntax attributeArgumentSyntax in attributeEntry.attribute.ArgumentList.Arguments)
+                        foreach (AttributeArgumentSyntax attributeArgumentSyntax in attributeEntry.Value.ArgumentList.Arguments)
                         {
                             if (attributeArgumentSyntax.NameEquals is not null)
                             {

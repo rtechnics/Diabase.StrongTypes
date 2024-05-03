@@ -113,6 +113,65 @@ namespace Diabase.StrongTypes.Tests
             Assert.IsFalse(ss4.IsValid);
             Assert.IsNotNull(ss4.ValidationException);
         }
+
+        [TestMethod]
+        public void WithValidatedConstraint()
+        {
+
+            // arrange
+            const string const1 = "1";
+            const string const2 = "a";
+            const string const3 = "";
+            const string const4 = "2";
+
+
+            // act
+            var result1 = false;
+            var result2 = false;
+            var result3 = false;
+            var result4 = false;
+            try
+            {
+                TestValidatedConstraintString ss1 = const1;
+                result1 = true;
+            }
+            catch (ConstraintException)
+            {
+            }
+
+            try
+            {
+                TestValidatedConstraintString ss2 = const2;
+                result2 = true;
+            }
+            catch (ConstraintException)
+            {
+            }
+
+            try
+            {
+                TestValidatedConstraintString ss3 = const3;
+                result3 = true;
+            }
+            catch (ConstraintException)
+            {
+            }
+
+            try
+            {
+                TestValidatedConstraintString ss4 = const4;
+                result4 = true;
+            }
+            catch (ConstraintException)
+            {
+            }
+
+            // assert
+            Assert.IsTrue(result1);
+            Assert.IsFalse(result2);
+            Assert.IsFalse(result3);
+            Assert.IsFalse(result4);
+        }
     }
 
     [StrongStringType]
@@ -137,6 +196,26 @@ namespace Diabase.StrongTypes.Tests
     public partial class TestConstraintString
     {
         static Regex ConstraintRegEx = new(@"\d");
+        static bool CustomValidate(string? value, out ConstraintException? exception)
+        {
+            if (value != "2")
+            {
+                exception = null;
+                return true;
+            }
+            else
+            {
+                exception = new ConstraintException("Value must not be 2.");
+                return false;
+            }
+        }
+    }
+
+    [StrongStringType(Constraints = StringConstraint.Required | StringConstraint.Regex | StringConstraint.Custom, ValidationRequired = true)]
+    public partial class TestValidatedConstraintString
+    {
+        static Regex ConstraintRegEx = new(@"\d");
+        
         static bool CustomValidate(string? value, out ConstraintException? exception)
         {
             if (value != "2")
