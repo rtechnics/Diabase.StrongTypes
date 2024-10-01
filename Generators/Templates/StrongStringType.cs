@@ -61,7 +61,7 @@ namespace Diabase.StrongTypes.Templates
         public override int GetHashCode() => value.GetHashCode();
         public int CompareTo(StrongStringType? other) => value.CompareTo(other?.value);
         public int CompareTo(object? obj) => obj is StrongStringType strongId ? value.CompareTo(strongId.value) : value.CompareTo(obj);
-        public static implicit operator BackingType(StrongStringType value) => value?.value!;
+        public static implicit operator BackingType(StrongStringType? value) => value?.value!;
 #if IMPLICIT_NULL_CONVERSION_NONE 
         public static implicit operator StrongStringType(BackingType value) => new(value ?? string.Empty);
 #elif IMPLICIT_NULL_CONVERSION_EMPTY
