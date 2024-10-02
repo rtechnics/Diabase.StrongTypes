@@ -61,7 +61,7 @@ namespace Diabase.StrongTypes.Templates
         public override int GetHashCode() => value.GetHashCode();
         public int CompareTo(StrongStringType? other) => value.CompareTo(other?.value);
         public int CompareTo(object? obj) => obj is StrongStringType strongId ? value.CompareTo(strongId.value) : value.CompareTo(obj);
-        public static implicit operator BackingType(StrongStringType value) => value.value;
+        public static implicit operator BackingType(StrongStringType? value) => value?.value!;
 #if IMPLICIT_NULL_CONVERSION_NONE 
         public static implicit operator StrongStringType(BackingType value) => new(value ?? string.Empty);
 #elif IMPLICIT_NULL_CONVERSION_EMPTY
@@ -102,14 +102,14 @@ namespace Diabase.StrongTypes.Templates
             if (a is null && b is null) return true;
             if (a is not null && b is not null) return String.Equals(a.value, b.value, comparisonType);
             return false;
-        } 
+        }
         public static bool Equals(StrongStringType? a, StrongStringType? b)
         {
             if (a is null && b is null) return true;
             if (a is not null && b is not null) return String.Equals(a.value, b.value);
             return false;
         }
-    public static StrongStringType Format(String format, params object[] args) => String.Format(format, args)!;
+        public static StrongStringType Format(String format, params object[] args) => String.Format(format, args)!;
         public static StrongStringType Format(String format, object arg0, object arg1, object arg2) => String.Format(format, arg0, arg1, arg2)!;
         public static StrongStringType Format(String format, object arg0, object arg1) => String.Format(format, arg0, arg1)!;
         public static StrongStringType Format(String format, object arg0) => String.Format(format, arg0)!;
@@ -117,8 +117,8 @@ namespace Diabase.StrongTypes.Templates
         public static StrongStringType Format(IFormatProvider provider, String format, object arg0, object arg1, object arg2) => String.Format(provider, format, arg0, arg1, arg2)!;
         public static StrongStringType Format(IFormatProvider provider, String format, object arg0, object arg1) => String.Format(provider, format, arg0, arg1)!;
         public static StrongStringType Format(IFormatProvider provider, String format, object arg0) => String.Format(provider, format, arg0)!;
-        public static bool IsNullOrEmpty(StrongStringType value) => value is null || String.IsNullOrEmpty(value);
-        public static bool IsNullOrWhiteSpace(StrongStringType value) => value is null || String.IsNullOrWhiteSpace(value);
+        public static bool IsNullOrEmpty(StrongStringType? value) => value is null || String.IsNullOrEmpty(value.value);
+        public static bool IsNullOrWhiteSpace(StrongStringType? value) => value is null || String.IsNullOrWhiteSpace(value.value);
         public static StrongStringType Join(String separator, IEnumerable<StrongStringType> values) => String.Join(separator, values.Cast<string>())!;
         public static StrongStringType Join(String separator, params object[] values) => String.Join(separator, values)!;
         public static StrongStringType Join(String separator, params StrongStringType[] value) => String.Join(separator, value.Cast<string>().ToArray())!;
@@ -215,7 +215,11 @@ namespace Diabase.StrongTypes.Templates
         public uint ToUInt32(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, uint>(value, provider);
         public ulong ToUInt64(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, ulong>(value, provider);
 
+#if VALIDATION_REQUIRED
+        public static StrongStringType Empty => new();
+#else
         public static readonly StrongStringType Empty = new();
+#endif
         public bool IsEmpty => string.IsNullOrEmpty(value);
         public bool IsNotEmpty => !string.IsNullOrEmpty(value);
 

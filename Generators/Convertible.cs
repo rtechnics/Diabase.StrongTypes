@@ -33,5 +33,20 @@ namespace Diabase.StrongTypes
             };
             return result;
         }
+
+        public static T FromBytes<T>(byte[] bytes)
+        {
+            object result = Type.GetTypeCode(typeof(T)) switch
+            {
+                TypeCode.Int16 => BitConverter.ToInt16(bytes, 0),
+                TypeCode.Int32 => BitConverter.ToInt32(bytes, 0),
+                TypeCode.Int64 => BitConverter.ToInt64(bytes, 0),
+                TypeCode.UInt16 => BitConverter.ToUInt16(bytes, 0),
+                TypeCode.UInt32 => BitConverter.ToUInt32(bytes, 0),
+                TypeCode.UInt64 => BitConverter.ToUInt64(bytes, 0),
+                _ => throw new NotImplementedException(),
+            };
+            return (T)result;
+        }
     }
 }

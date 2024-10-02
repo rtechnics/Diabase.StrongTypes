@@ -5,11 +5,18 @@
 #define INCLUDE_JSON_CONVERTER
 #define INCLUDE_VALUE_CONVERTER
 #define USE_CUSTOM_CONVERTER
+#define INCLUDE_PUBLIC_ID
+
 
 using System;
+#if INCLUDE_PUBLIC_ID
+using System.Security.Cryptography;
+using System.Text;
+#endif
 #if INCLUDE_TYPE_CONVERTER
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 #endif
 #if INCLUDE_JSON_CONVERTER
 using System.Text.Json;
@@ -74,6 +81,83 @@ namespace Diabase.StrongTypes.Templates
 
         readonly BackingType value;
 
+#if INCLUDE_PUBLIC_ID
+        public static string AesKey { get; set; } = "--AES-KEY--"; // This can be set either through the attribute or at runtime
+        public static string AesIV { get; set; } = "--AES-IV--"; // This can be set either through the attribute or at runtime
+
+        static void ValidateAesKeys()
+        {
+            if (AesKey.Length != 32)
+            {
+                throw new InvalidOperationException($"AES key must be 32 characters long for type '{typeof(StrongValueId).Name}'");
+            }
+            if (AesIV.Length != 16)
+            {
+                throw new InvalidOperationException($"AES IV must be 16 characters long for type '{typeof(StrongValueId).Name}'");
+            }
+        }
+
+        public readonly struct PublicIdType
+        {
+            private readonly string value;
+
+            public PublicIdType(string value)
+            {
+                this.value = value;
+            }
+
+            public static PublicIdType FromType(BackingType value)
+            {
+                ValidateAesKeys();
+
+                var dataToEncrypt = BitConverter.GetBytes(value);
+
+                using Aes aes = Aes.Create();
+                aes.Key = Encoding.UTF8.GetBytes(AesKey);
+                aes.IV = Encoding.UTF8.GetBytes(AesIV);
+
+                using MemoryStream memoryStream = new();
+                using (CryptoStream cryptoStream = new(memoryStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                {
+                    cryptoStream.Write(dataToEncrypt, 0, dataToEncrypt.Length);
+                    cryptoStream.FlushFinalBlock();
+                }
+                var encryptedData = memoryStream.ToArray();
+                var encrypted = Convert.ToBase64String(encryptedData).Replace('+', '-').Replace('/', '_').Replace('=', '$');
+                return new PublicIdType(encrypted);
+            }
+
+            public BackingType ToType()
+            {
+                ValidateAesKeys();
+
+                var base64 = value.Replace('-', '+').Replace('_', '/').Replace('$', '=');
+                var encryptedData = Convert.FromBase64String(base64);
+
+                using Aes aes = Aes.Create();
+                aes.Key = Encoding.UTF8.GetBytes(AesKey);
+                aes.IV = Encoding.UTF8.GetBytes(AesIV);
+
+                using MemoryStream memoryStream = new();
+                using (CryptoStream cryptoStream = new(memoryStream, aes.CreateDecryptor(), CryptoStreamMode.Write))
+                {
+                    cryptoStream.Write(encryptedData, 0, encryptedData.Length);
+                    cryptoStream.FlushFinalBlock();
+                }
+                var decryptedData = memoryStream.ToArray();
+                return Diabase.StrongTypes.Convertible.FromBytes<BackingType>(decryptedData);
+            }
+
+            public static implicit operator string(PublicIdType value) => value.value;
+            public static implicit operator PublicIdType(string value) => new(value);
+        }
+
+        public PublicIdType Public => PublicIdType.FromType(value);
+        public static StrongValueId FromPublic(PublicIdType value) => new(value.ToType());
+
+        public static implicit operator string(StrongValueId value) => value.Public;
+        public static implicit operator StrongValueId(string encrypted) => FromPublic(new PublicIdType(encrypted));
+#endif
 
 #if INCLUDE_JSON_CONVERTER
         public partial class ThisJsonConverter : JsonConverter<StrongValueId>

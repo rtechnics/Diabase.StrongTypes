@@ -30,6 +30,28 @@ namespace Diabase.StrongTypes.Tests
         }
 
         [TestMethod]
+        public void StrongIntIdUsingPublic()
+        {
+            // arrange
+            const int id1 = 101;
+
+            // act
+            IntIdPA pida1 = (IntIdPA)id1;
+            string sida = pida1.Public;
+            IntIdPA pida2 = IntIdPA.FromPublic(sida);
+            IntIdPB pidb1 = (IntIdPB)id1;
+            string sidb = pidb1.Public;
+
+            int rida = pida2;
+            int ridb = pidb1;
+
+            // assert
+            Assert.AreEqual(id1, rida);
+            Assert.AreEqual(id1, ridb);
+            Assert.AreNotEqual(sida, sidb);
+        }
+
+        [TestMethod]
         public void StrongStringId()
         {
             const string id1 = "123";
@@ -104,6 +126,16 @@ namespace Diabase.StrongTypes.Tests
 
     [StrongGuidId]
     public readonly partial struct GuidId
+    {
+    }
+
+    [StrongIntId(IncludePublicIdSupport = true, PublicIdAesKey = "0123456789abcdef0123456789abcdef", PublicIdAesIv = "0123456789abcdef")]
+    public readonly partial struct IntIdPA
+    {
+    }
+
+    [StrongIntId(IncludePublicIdSupport = true, PublicIdAesKey = "abcdef0123456789abcdef0123456789", PublicIdAesIv = "abcdef0123456789")]
+    public readonly partial struct IntIdPB
     {
     }
 }

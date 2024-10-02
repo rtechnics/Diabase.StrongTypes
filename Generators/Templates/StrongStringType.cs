@@ -102,14 +102,14 @@ namespace Diabase.StrongTypes.Templates
             if (a is null && b is null) return true;
             if (a is not null && b is not null) return String.Equals(a.value, b.value, comparisonType);
             return false;
-        } 
+        }
         public static bool Equals(StrongStringType? a, StrongStringType? b)
         {
             if (a is null && b is null) return true;
             if (a is not null && b is not null) return String.Equals(a.value, b.value);
             return false;
         }
-    public static StrongStringType Format(String format, params object[] args) => String.Format(format, args)!;
+        public static StrongStringType Format(String format, params object[] args) => String.Format(format, args)!;
         public static StrongStringType Format(String format, object arg0, object arg1, object arg2) => String.Format(format, arg0, arg1, arg2)!;
         public static StrongStringType Format(String format, object arg0, object arg1) => String.Format(format, arg0, arg1)!;
         public static StrongStringType Format(String format, object arg0) => String.Format(format, arg0)!;

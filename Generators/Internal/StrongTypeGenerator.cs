@@ -75,6 +75,9 @@ namespace Diabase.StrongTypes.Generators.Internal
                 (s) => entry.Parameters.NumericConstraints?.Contains(NumericConstraint.MaximumValue)??false ? s : s.Undefine("CONSTRAINT_MAX_VALUE"),
                 (s) => (entry.Parameters.StringConstraints?.Contains(StringConstraint.Custom)??false) || (entry.Parameters.NumericConstraints?.Contains(NumericConstraint.Custom)??false) ? s : s.Undefine("CONSTRAINT_CUSTOM"),
                 (s) => entry.Parameters.ValidationRequired ? s : s.Undefine("VALIDATION_REQUIRED"),
+                (s) => entry.Parameters.IncludePublicIdSupport ? s : s.Undefine("INCLUDE_PUBLIC_ID"),
+                (s) => !string.IsNullOrEmpty(entry.Parameters.PublicIdAesKey) ? s.Replace("\"--AES-KEY--\"", entry.Parameters.PublicIdAesKey) : s,
+                (s) => !string.IsNullOrEmpty(entry.Parameters.PublicIdAesIv) ? s.Replace("\"--AES-IV--\"", entry.Parameters.PublicIdAesIv) : s,
                 (s) => entry.Parameters.Converters?.Contains(Converter.JsonConverter)??false ? s : s.Undefine("INCLUDE_JSON_CONVERTER"),
                 (s) => entry.Parameters.Converters?.Contains(Converter.TypeConverter)??false ? s : s.Undefine("INCLUDE_TYPE_CONVERTER"),
                 (s) => entry.Parameters.Converters?.Contains(Converter.ValueConverter)??false ? s : s.Undefine("INCLUDE_VALUE_CONVERTER"),
@@ -111,6 +114,9 @@ namespace Diabase.StrongTypes.Generators.Internal
             public StringConstraint[] StringConstraints;
             public NumericConstraint[] NumericConstraints;
             public bool ValidationRequired;
+            public bool IncludePublicIdSupport;
+            public string PublicIdAesKey;
+            public string PublicIdAesIv;
             public Converter[] Converters;
         }
 
@@ -148,11 +154,15 @@ namespace Diabase.StrongTypes.Generators.Internal
 
         class SyntaxReceiver : ISyntaxContextReceiver
         {
-            // Names of parameters and values in the StrongType attribute
+            // Names of parameters in the StrongType attribute
             private const string implicitNullConversionMode = "ImplicitNullConversionMode";
             private const string constraints = "Constraints";
             private const string converters = "Converters";
             private const string validationRequired = "ValidationRequired";
+            private const string includePublicIdSupport = "IncludePublicIdSupport";
+            private const string publicIdAesKey = "PublicIdAesKey";
+            private const string publicIdAesIv = "PublicIdAesIv";
+            // Parameter values in the StrongType attribute
             private const string booleanTrue = "true";
 
             public List<Entry> Entries = new(); // List of classes and structs that have the StrongType attribute
@@ -224,6 +234,21 @@ namespace Diabase.StrongTypes.Generators.Internal
                                 case validationRequired:
                                     {
                                         result.ValidationRequired = expression == booleanTrue;
+                                        break;
+                                    }
+                                case includePublicIdSupport:
+                                    {
+                                        result.IncludePublicIdSupport = expression == booleanTrue;
+                                        break;
+                                    }
+                                case publicIdAesKey:
+                                    {
+                                        result.PublicIdAesKey = expression;
+                                        break;
+                                    }
+                                case publicIdAesIv:
+                                    {
+                                        result.PublicIdAesIv = expression;
                                         break;
                                     }
                             }

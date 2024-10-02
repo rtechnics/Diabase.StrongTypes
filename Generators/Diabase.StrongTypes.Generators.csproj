@@ -38,7 +38,9 @@
     <EmbeddedResource Include="Templates\StrongIntType.cs" />
     <EmbeddedResource Include="Templates\StrongReferenceId.cs" />
     <EmbeddedResource Include="Templates\StrongStringType.cs" />
-    <EmbeddedResource Include="Templates\StrongValueId.cs" />
+    <EmbeddedResource Include="Templates\StrongValueId.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
