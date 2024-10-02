@@ -6,6 +6,7 @@
 #define INCLUDE_VALUE_CONVERTER
 #define USE_CUSTOM_CONVERTER
 #define INCLUDE_PUBLIC_ID
+#define INCLUDE_IMPLICIT_STRING_CONVERSION
 
 
 using System;
@@ -30,6 +31,9 @@ using BackingType = System.Int32;
 
 namespace Diabase.StrongTypes.Templates
 {
+    using Convertible = Diabase.StrongTypes.Convertible;
+
+
 #if INCLUDE_JSON_CONVERTER
     [JsonConverter(typeof(ThisJsonConverter))]
 #endif
@@ -57,22 +61,22 @@ namespace Diabase.StrongTypes.Templates
         public static bool operator !=(BackingType left, StrongValueId right) => left != right.value;
 
         public TypeCode GetTypeCode() => Type.GetTypeCode(typeof(BackingType));
-        public bool ToBoolean(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, bool>(value, provider);
-        public byte ToByte(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, byte>(value, provider);
-        public char ToChar(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, char>(value, provider);
-        public DateTime ToDateTime(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, DateTime>(value, provider);
-        public decimal ToDecimal(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, decimal>(value, provider);
-        public double ToDouble(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, double>(value, provider);
-        public short ToInt16(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, short>(value, provider);
-        public int ToInt32(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, int>(value, provider);
-        public long ToInt64(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, long>(value, provider);
-        public sbyte ToSByte(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, sbyte>(value, provider);
-        public float ToSingle(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, float>(value, provider);
-        public string ToString(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, string>(value, provider);
-        public object ToType(Type conversionType, IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType(conversionType, value, provider);
-        public ushort ToUInt16(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, ushort>(value, provider);
-        public uint ToUInt32(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, uint>(value, provider);
-        public ulong ToUInt64(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, ulong>(value, provider);
+        public bool ToBoolean(IFormatProvider? provider) => Convertible.ToType<BackingType, bool>(value, provider);
+        public byte ToByte(IFormatProvider? provider) => Convertible.ToType<BackingType, byte>(value, provider);
+        public char ToChar(IFormatProvider? provider) => Convertible.ToType<BackingType, char>(value, provider);
+        public DateTime ToDateTime(IFormatProvider? provider) => Convertible.ToType<BackingType, DateTime>(value, provider);
+        public decimal ToDecimal(IFormatProvider? provider) => Convertible.ToType<BackingType, decimal>(value, provider);
+        public double ToDouble(IFormatProvider? provider) => Convertible.ToType<BackingType, double>(value, provider);
+        public short ToInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, short>(value, provider);
+        public int ToInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, int>(value, provider);
+        public long ToInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, long>(value, provider);
+        public sbyte ToSByte(IFormatProvider? provider) => Convertible.ToType<BackingType, sbyte>(value, provider);
+        public float ToSingle(IFormatProvider? provider) => Convertible.ToType<BackingType, float>(value, provider);
+        public string ToString(IFormatProvider? provider) => Convertible.ToType<BackingType, string>(value, provider);
+        public object ToType(Type conversionType, IFormatProvider? provider) => Convertible.ToType(conversionType, value, provider);
+        public ushort ToUInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, ushort>(value, provider);
+        public uint ToUInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, uint>(value, provider);
+        public ulong ToUInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, ulong>(value, provider);
 
         StrongValueId(BackingType value)
         {
@@ -145,7 +149,7 @@ namespace Diabase.StrongTypes.Templates
                     cryptoStream.FlushFinalBlock();
                 }
                 var decryptedData = memoryStream.ToArray();
-                return Diabase.StrongTypes.Convertible.FromBytes<BackingType>(decryptedData);
+                return Convertible.FromBytes<BackingType>(decryptedData);
             }
 
             public static implicit operator string(PublicIdType value) => value.value;
@@ -155,8 +159,16 @@ namespace Diabase.StrongTypes.Templates
         public PublicIdType Public => PublicIdType.FromType(value);
         public static StrongValueId FromPublic(PublicIdType value) => new(value.ToType());
 
+#endif
+
+#if INCLUDE_IMPLICIT_STRING_CONVERSION
+#if INCLUDE_PUBLIC_ID
         public static implicit operator string(StrongValueId value) => value.Public;
         public static implicit operator StrongValueId(string encrypted) => FromPublic(new PublicIdType(encrypted));
+#else
+        public static implicit operator StrongValueId(string value) => new(BackingType.Parse(value));
+        public static implicit operator string(StrongValueId value) => value.ToString()!;
+#endif
 #endif
 
 #if INCLUDE_JSON_CONVERTER

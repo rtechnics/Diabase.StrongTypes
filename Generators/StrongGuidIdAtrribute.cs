@@ -3,7 +3,7 @@
 namespace Diabase.StrongTypes
 {
     [AttributeUsage(AttributeTargets.Struct, Inherited = false)]
-    public class StrongGuidIdAttribute : StrongIdAttribute
+    public class StrongGuidIdAttribute : StrongValueIdAttribute
     {
     }
 }

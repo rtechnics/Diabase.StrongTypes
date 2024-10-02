@@ -78,6 +78,7 @@ namespace Diabase.StrongTypes.Generators.Internal
                 (s) => entry.Parameters.IncludePublicIdSupport ? s : s.Undefine("INCLUDE_PUBLIC_ID"),
                 (s) => !string.IsNullOrEmpty(entry.Parameters.PublicIdAesKey) ? s.Replace("\"--AES-KEY--\"", entry.Parameters.PublicIdAesKey) : s,
                 (s) => !string.IsNullOrEmpty(entry.Parameters.PublicIdAesIv) ? s.Replace("\"--AES-IV--\"", entry.Parameters.PublicIdAesIv) : s,
+                (s) => entry.Parameters.IncludeImplicitStringConversion ? s : s.Undefine("INCLUDE_IMPLICIT_STRING_CONVERSION"),
                 (s) => entry.Parameters.Converters?.Contains(Converter.JsonConverter)??false ? s : s.Undefine("INCLUDE_JSON_CONVERTER"),
                 (s) => entry.Parameters.Converters?.Contains(Converter.TypeConverter)??false ? s : s.Undefine("INCLUDE_TYPE_CONVERTER"),
                 (s) => entry.Parameters.Converters?.Contains(Converter.ValueConverter)??false ? s : s.Undefine("INCLUDE_VALUE_CONVERTER"),
@@ -117,6 +118,7 @@ namespace Diabase.StrongTypes.Generators.Internal
             public bool IncludePublicIdSupport;
             public string PublicIdAesKey;
             public string PublicIdAesIv;
+            public bool IncludeImplicitStringConversion;
             public Converter[] Converters;
         }
 
@@ -162,6 +164,7 @@ namespace Diabase.StrongTypes.Generators.Internal
             private const string includePublicIdSupport = "IncludePublicIdSupport";
             private const string publicIdAesKey = "PublicIdAesKey";
             private const string publicIdAesIv = "PublicIdAesIv";
+            private const string includeImplicitStringConversion = "IncludeImplicitStringConversion";
             // Parameter values in the StrongType attribute
             private const string booleanTrue = "true";
 
@@ -249,6 +252,11 @@ namespace Diabase.StrongTypes.Generators.Internal
                                 case publicIdAesIv:
                                     {
                                         result.PublicIdAesIv = expression;
+                                        break;
+                                    }
+                                case includeImplicitStringConversion:
+                                    {
+                                        result.IncludeImplicitStringConversion = expression == booleanTrue;
                                         break;
                                     }
                             }

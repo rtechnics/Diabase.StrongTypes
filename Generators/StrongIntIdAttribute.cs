@@ -3,7 +3,7 @@
 namespace Diabase.StrongTypes
 {
     [AttributeUsage(AttributeTargets.Struct, Inherited = false)]
-    public class StrongIntIdAttribute : StrongIdAttribute
+    public class StrongIntIdAttribute : StrongValueIdAttribute
     {
         public bool IncludePublicIdSupport { get; set; }
         public string PublicIdAesKey { get; set; }

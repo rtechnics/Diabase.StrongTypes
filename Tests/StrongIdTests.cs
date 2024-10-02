@@ -52,6 +52,46 @@ namespace Diabase.StrongTypes.Tests
         }
 
         [TestMethod]
+        public void StrongIntIdImplicitStringConversion()
+        {
+            // arrange
+            const int id1 = 101;
+
+            // act
+            IntIdSA pida1 = id1;
+            string sida = pida1;
+            IntIdSA pida2 = sida;
+
+            int rida = pida1;
+            int ridb = pida2;
+
+            // assert
+            Assert.AreEqual(id1, rida);
+            Assert.AreEqual(id1, ridb);
+        }
+
+        [TestMethod]
+        public void StrongIntIdImplicitStringConversionAsPublicId()
+        {
+            // arrange
+            const int id1 = 101;
+
+            // act
+            IntIdPA pida1 = id1;
+            string sida = pida1;
+            IntIdPA pida2 = sida;
+
+            int rida = pida1;
+            int ridb = pida2;
+
+            // assert
+            Assert.AreEqual(id1, rida);
+            Assert.AreEqual(id1, ridb);
+            Assert.AreNotEqual("101", sida);
+        }
+
+
+        [TestMethod]
         public void StrongStringId()
         {
             const string id1 = "123";
@@ -102,6 +142,26 @@ namespace Diabase.StrongTypes.Tests
             Assert.IsTrue(sid1 != sid2);
             Assert.IsNull(sid3);
         }
+
+        [TestMethod]
+        public void StrongGuidIdImplicitStringConversion()
+        {
+            // arrange
+            Guid id1 = Guid.Parse("{F564F5D7-66A8-45A4-A140-297424494558}");
+
+            // act
+            GuidIdS pida1 = id1;
+            string sida = pida1;
+            GuidIdS pida2 = sida;
+
+            Guid rida = pida1;
+            Guid ridb = pida2;
+
+            // assert
+            Assert.AreEqual(id1, rida);
+            Assert.AreEqual(id1, ridb);
+        }
+
     }
 
     [StrongIntId]
@@ -129,13 +189,23 @@ namespace Diabase.StrongTypes.Tests
     {
     }
 
-    [StrongIntId(IncludePublicIdSupport = true, PublicIdAesKey = "0123456789abcdef0123456789abcdef", PublicIdAesIv = "0123456789abcdef")]
+    [StrongGuidId(IncludeImplicitStringConversion = true)]
+    public readonly partial struct GuidIdS
+    {
+    }
+
+    [StrongIntId(IncludePublicIdSupport = true, PublicIdAesKey = "0123456789abcdef0123456789abcdef", PublicIdAesIv = "0123456789abcdef", IncludeImplicitStringConversion = true)]
     public readonly partial struct IntIdPA
     {
     }
 
     [StrongIntId(IncludePublicIdSupport = true, PublicIdAesKey = "abcdef0123456789abcdef0123456789", PublicIdAesIv = "abcdef0123456789")]
     public readonly partial struct IntIdPB
+    {
+    }
+
+    [StrongIntId(IncludeImplicitStringConversion = true)]
+    public readonly partial struct IntIdSA
     {
     }
 }
