@@ -52,6 +52,23 @@ namespace Diabase.StrongTypes.Tests
         }
 
         [TestMethod]
+        public void StrongIntIdUsingCustomPublic()
+        {
+            // arrange
+            const int id1 = 101;
+
+            // act
+            IntIdCP pida1 = id1;
+            string sida = pida1.Public;
+            IntIdCP pida2 = IntIdCP.FromPublic(sida);
+
+            int rida = pida2;
+
+            // assert
+            Assert.AreEqual(id1, rida);
+        }
+
+        [TestMethod]
         public void StrongIntIdImplicitStringConversion()
         {
             // arrange
@@ -207,5 +224,12 @@ namespace Diabase.StrongTypes.Tests
     [StrongIntId(IncludeImplicitStringConversion = true)]
     public readonly partial struct IntIdSA
     {
+    }
+
+    [StrongIntId(IncludePublicIdSupport = true, UseCustomEncryption = true)]
+    public readonly partial struct IntIdCP
+    {
+        static string CustomEncrypt(Int32 value) => value.ToString();
+        static Int32 CustomDecrypt(string value) => Int32.Parse(value);
     }
 }

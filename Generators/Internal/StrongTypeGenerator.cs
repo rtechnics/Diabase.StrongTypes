@@ -83,6 +83,7 @@ namespace Diabase.StrongTypes.Generators.Internal
                 (s) => entry.Parameters.Converters?.Contains(Converter.TypeConverter)??false ? s : s.Undefine("INCLUDE_TYPE_CONVERTER"),
                 (s) => entry.Parameters.Converters?.Contains(Converter.ValueConverter)??false ? s : s.Undefine("INCLUDE_VALUE_CONVERTER"),
                 (s) => entry.Parameters.Converters?.Contains(Converter.Customize)??false ? s : s.Undefine("USE_CUSTOM_CONVERTER"),
+                (s) => entry.Parameters.UseCustomEncryption ? s : s.Undefine("USE_CUSTOM_ENCRYPTION"),
                 (s) => s.Replace("internal", "public"),
                 (s) => s.Replace("Diabase.StrongTypes.Templates", entry.NamespaceIdentifier),
                 (s) => s.Replace(entry.Parameters.TemplateName, entry.TypeIdentifier),
@@ -119,6 +120,7 @@ namespace Diabase.StrongTypes.Generators.Internal
             public string PublicIdAesKey;
             public string PublicIdAesIv;
             public bool IncludeImplicitStringConversion;
+            public bool UseCustomEncryption;
             public Converter[] Converters;
         }
 
@@ -165,6 +167,7 @@ namespace Diabase.StrongTypes.Generators.Internal
             private const string publicIdAesKey = "PublicIdAesKey";
             private const string publicIdAesIv = "PublicIdAesIv";
             private const string includeImplicitStringConversion = "IncludeImplicitStringConversion";
+            private const string useCustomEncryption = "UseCustomEncryption";
             // Parameter values in the StrongType attribute
             private const string booleanTrue = "true";
 
@@ -211,54 +214,60 @@ namespace Diabase.StrongTypes.Generators.Internal
                             switch (argumentName)
                             {
                                 case implicitNullConversionMode:
+                                {
+                                    var enumIdentifier = attributeArgumentSyntax.Expression.ToString().Split('.').Last();
+                                    if (Enum.TryParse<ImplicitNullConversionMode>(enumIdentifier, out var implicitNullConversionMode))
                                     {
-                                        var enumIdentifier = attributeArgumentSyntax.Expression.ToString().Split('.').Last();
-                                        if (Enum.TryParse<ImplicitNullConversionMode>(enumIdentifier, out var implicitNullConversionMode))
-                                        {
-                                            result.ImplicitNullConversionMode = implicitNullConversionMode;
-                                        }
-                                        break;
+                                        result.ImplicitNullConversionMode = implicitNullConversionMode;
                                     }
+                                    break;
+                                }
                                 case constraints:
-                                    {
-                                        var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
-                                        var enums = enumsExpressions.Select(enumExpression => ParseConstraint(enumExpression));
-                                        result.StringConstraints = enums.Where(x => x.StringConstraint is not null).Select(x => x.StringConstraint.Value).ToArray();
-                                        result.NumericConstraints = enums.Where(x => x.NumericConstraint is not null).Select(x => x.NumericConstraint.Value).ToArray();
-                                        break;
-                                    }
+                                {
+                                    var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
+                                    var enums = enumsExpressions.Select(enumExpression => ParseConstraint(enumExpression));
+                                    result.StringConstraints = enums.Where(x => x.StringConstraint is not null).Select(x => x.StringConstraint.Value).ToArray();
+                                    result.NumericConstraints = enums.Where(x => x.NumericConstraint is not null).Select(x => x.NumericConstraint.Value).ToArray();
+                                    break;
+                                }
                                 case converters:
-                                    {
-                                        var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
-                                        var enums = enumsExpressions.Select(enumExpression => (Converter)Enum.Parse(typeof(Converter), enumExpression));
-                                        result.Converters = enums.ToArray();
-                                        break;
-                                    }
+                                {
+                                    var enumsExpressions = expression.Split('|').Select(x => x.Trim()).Select(x => x.Split('.').Last());
+                                    var enums = enumsExpressions.Select(enumExpression => (Converter)Enum.Parse(typeof(Converter), enumExpression));
+                                    result.Converters = enums.ToArray();
+                                    break;
+                                }
                                 case validationRequired:
-                                    {
-                                        result.ValidationRequired = expression == booleanTrue;
-                                        break;
-                                    }
+                                {
+                                    result.ValidationRequired = expression == booleanTrue;
+                                    break;
+                                }
                                 case includePublicIdSupport:
-                                    {
-                                        result.IncludePublicIdSupport = expression == booleanTrue;
-                                        break;
-                                    }
+                                {
+                                    result.IncludePublicIdSupport = expression == booleanTrue;
+                                    break;
+                                }
                                 case publicIdAesKey:
-                                    {
-                                        result.PublicIdAesKey = expression;
-                                        break;
-                                    }
+                                {
+                                    result.PublicIdAesKey = expression;
+                                    break;
+                                }
                                 case publicIdAesIv:
-                                    {
-                                        result.PublicIdAesIv = expression;
-                                        break;
-                                    }
+                                {
+                                    result.PublicIdAesIv = expression;
+                                    break;
+                                }
                                 case includeImplicitStringConversion:
-                                    {
-                                        result.IncludeImplicitStringConversion = expression == booleanTrue;
-                                        break;
-                                    }
+                                {
+                                    result.IncludeImplicitStringConversion = expression == booleanTrue;
+                                    break;
+                                }
+                                case useCustomEncryption:
+                                {
+                                    result.UseCustomEncryption = expression == booleanTrue;
+                                    break;
+                                }
+
                             }
                         }
                     }

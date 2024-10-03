@@ -7,10 +7,11 @@
 #define USE_CUSTOM_CONVERTER
 #define INCLUDE_PUBLIC_ID
 #define INCLUDE_IMPLICIT_STRING_CONVERSION
+#define USE_CUSTOM_ENCRYPTION
 
 
 using System;
-#if INCLUDE_PUBLIC_ID
+#if INCLUDE_PUBLIC_ID && !USE_CUSTOM_ENCRYPTION
 using System.Security.Cryptography;
 using System.Text;
 #endif
@@ -112,6 +113,7 @@ namespace Diabase.StrongTypes.Templates
 
             public static PublicIdType FromType(BackingType value)
             {
+#if !USE_CUSTOM_ENCRYPTION
                 ValidateAesKeys();
 
                 var dataToEncrypt = BitConverter.GetBytes(value);
@@ -129,10 +131,14 @@ namespace Diabase.StrongTypes.Templates
                 var encryptedData = memoryStream.ToArray();
                 var encrypted = Convert.ToBase64String(encryptedData).Replace('+', '-').Replace('/', '_').Replace('=', '$');
                 return new PublicIdType(encrypted);
+#else
+                return new PublicIdType(CustomEncrypt(value));
+#endif
             }
 
             public BackingType ToType()
             {
+#if !USE_CUSTOM_ENCRYPTION
                 ValidateAesKeys();
 
                 var base64 = value.Replace('-', '+').Replace('_', '/').Replace('$', '=');
@@ -150,6 +156,9 @@ namespace Diabase.StrongTypes.Templates
                 }
                 var decryptedData = memoryStream.ToArray();
                 return Convertible.FromBytes<BackingType>(decryptedData);
+#else
+                return CustomDecrypt(value);
+#endif
             }
 
             public static implicit operator string(PublicIdType value) => value.value;
@@ -158,6 +167,11 @@ namespace Diabase.StrongTypes.Templates
 
         public PublicIdType Public => PublicIdType.FromType(value);
         public static StrongValueId FromPublic(PublicIdType value) => new(value.ToType());
+
+#if DESIGN_MODE
+        static string CustomEncrypt(BackingType value) => value.ToString();
+        static BackingType CustomDecrypt(string value) => BackingType.Parse(value);
+#endif
 
 #endif
 

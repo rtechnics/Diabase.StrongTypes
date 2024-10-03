@@ -8,5 +8,6 @@ namespace Diabase.StrongTypes
         public bool IncludePublicIdSupport { get; set; }
         public string PublicIdAesKey { get; set; }
         public string PublicIdAesIv { get; set; }
+        public bool UseCustomEncryption { get; set; }
     }
 }
