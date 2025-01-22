@@ -132,7 +132,7 @@ namespace Diabase.StrongTypes.Templates
 
         public class NullableStrongValueConverter : ValueConverter<StrongReferenceId?, string?>
         {
-            public NullableStrongValueConverter() : base(v => v, v => v)
+            public NullableStrongValueConverter() : base(v => (object?)v != null ? v : null, v => (object?)v != null ? (StrongReferenceId?)new StrongReferenceId(v) : null)
             {
             }
         }

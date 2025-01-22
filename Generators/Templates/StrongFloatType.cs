@@ -210,7 +210,7 @@ namespace Diabase.StrongTypes.Templates
 
         public class NullableStrongValueConverter : ValueConverter<StrongFloatType?, BackingType?>
         {
-            public NullableStrongValueConverter() : base(v => v, v => v)
+            public NullableStrongValueConverter() : base(v => (object?)v != null ? v : null, v => (object?)v != null ? new StrongFloatType(v.Value) : null)
             {
             }
         }

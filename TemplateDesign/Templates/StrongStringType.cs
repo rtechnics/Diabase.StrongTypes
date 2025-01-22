@@ -12,6 +12,7 @@
 #define INCLUDE_TYPE_CONVERTER
 #define INCLUDE_JSON_CONVERTER
 #define INCLUDE_VALUE_CONVERTER
+#define INCLUDE_EMPTY_VALUE
 #define USE_CUSTOM_CONVERTER
 
 #if CONSTRAINT_REQUIRED || CONSTRAINT_REGEX || CONSTRAINT_CUSTOM
@@ -35,6 +36,8 @@ using System.ComponentModel;
 #if INCLUDE_JSON_CONVERTER
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
+
 #endif
 #if INCLUDE_VALUE_CONVERTER
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -215,9 +218,7 @@ namespace Diabase.StrongTypes.Templates
         public uint ToUInt32(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, uint>(value, provider);
         public ulong ToUInt64(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, ulong>(value, provider);
 
-#if VALIDATION_REQUIRED
-        public static StrongStringType Empty => new();
-#else
+#if INCLUDE_EMPTY_VALUE
         public static readonly StrongStringType Empty = new();
 #endif
         public bool IsEmpty => string.IsNullOrEmpty(value);
@@ -318,16 +319,16 @@ namespace Diabase.StrongTypes.Templates
 #endif
 
 #if INCLUDE_VALUE_CONVERTER
-        public class StrongValueConverter : ValueConverter<StrongReferenceId, string>
+        public class StrongValueConverter : ValueConverter<StrongStringType, string>
         {
             public StrongValueConverter() : base(v => v, v => v)
             {
             }
         }
 
-        public class NullableStrongValueConverter : ValueConverter<StrongReferenceId?, string?>
+        public class NullableStrongValueConverter : ValueConverter<StrongStringType?, string?>
         {
-            public NullableStrongValueConverter() : base(v => v, v => v)
+            public NullableStrongValueConverter() : base(v => (object?)v != null ? v : null, v => (object?)v != null ? new StrongStringType(v) : null)
             {
             }
         }

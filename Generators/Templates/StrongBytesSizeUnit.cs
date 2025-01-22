@@ -229,7 +229,7 @@ namespace Diabase.StrongTypes.Templates
 
         public class NullableStrongValueConverter : ValueConverter<StrongBytesSizeUnit?, BackingType?>
         {
-            public NullableStrongValueConverter() : base(v => v, v => v)
+            public NullableStrongValueConverter() : base(v => (object?)v != null ? v : null, v => (object?)v != null ? (StrongBytesSizeUnit?)new StrongBytesSizeUnit(v.Value) : null)
             {
             }
         }

@@ -76,6 +76,7 @@ namespace Diabase.StrongTypes.Generators.Internal
                 (s) => (entry.Parameters.StringConstraints?.Contains(StringConstraint.Custom)??false) || (entry.Parameters.NumericConstraints?.Contains(NumericConstraint.Custom)??false) ? s : s.Undefine("CONSTRAINT_CUSTOM"),
                 (s) => entry.Parameters.ValidationRequired ? s : s.Undefine("VALIDATION_REQUIRED"),
                 (s) => entry.Parameters.IncludePublicIdSupport ? s : s.Undefine("INCLUDE_PUBLIC_ID"),
+                (s) => entry.Parameters.IncludeEmptyValue ? s : s.Undefine("INCLUDE_EMPTY_VALUE"),
                 (s) => !string.IsNullOrEmpty(entry.Parameters.PublicIdAesKey) ? s.Replace("\"--AES-KEY--\"", entry.Parameters.PublicIdAesKey) : s,
                 (s) => !string.IsNullOrEmpty(entry.Parameters.PublicIdAesIv) ? s.Replace("\"--AES-IV--\"", entry.Parameters.PublicIdAesIv) : s,
                 (s) => entry.Parameters.IncludeImplicitStringConversion ? s : s.Undefine("INCLUDE_IMPLICIT_STRING_CONVERSION"),
@@ -117,6 +118,7 @@ namespace Diabase.StrongTypes.Generators.Internal
             public NumericConstraint[] NumericConstraints;
             public bool ValidationRequired;
             public bool IncludePublicIdSupport;
+            public bool IncludeEmptyValue;
             public string PublicIdAesKey;
             public string PublicIdAesIv;
             public bool IncludeImplicitStringConversion;
@@ -164,6 +166,7 @@ namespace Diabase.StrongTypes.Generators.Internal
             private const string converters = "Converters";
             private const string validationRequired = "ValidationRequired";
             private const string includePublicIdSupport = "IncludePublicIdSupport";
+            private const string includeEmptyValue = "IncludeEmptyValue";
             private const string publicIdAesKey = "PublicIdAesKey";
             private const string publicIdAesIv = "PublicIdAesIv";
             private const string includeImplicitStringConversion = "IncludeImplicitStringConversion";
@@ -245,6 +248,11 @@ namespace Diabase.StrongTypes.Generators.Internal
                                 case includePublicIdSupport:
                                 {
                                     result.IncludePublicIdSupport = expression == booleanTrue;
+                                    break;
+                                }
+                                case includeEmptyValue:
+                                {
+                                    result.IncludeEmptyValue = expression == booleanTrue;
                                     break;
                                 }
                                 case publicIdAesKey:

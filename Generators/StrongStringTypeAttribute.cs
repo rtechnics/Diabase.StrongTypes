@@ -8,5 +8,6 @@ namespace Diabase.StrongTypes
         public ImplicitNullConversionMode ImplicitNullConversionMode { get; set; }
         public StringConstraint Constraints { get; set; }
         public bool ValidationRequired { get; set; }
+        public bool IncludeEmptyValue { get; set; }
     }
 }

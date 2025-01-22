@@ -225,7 +225,7 @@ namespace Diabase.StrongTypes.Templates
 
         public class NullableStrongValueConverter : ValueConverter<StrongIntType?, BackingType?>
         {
-            public NullableStrongValueConverter() : base(v => v, v => v)
+            public NullableStrongValueConverter() : base(v => (object?)v != null ? v : null, v => (object?)v != null ? new StrongIntType(v.Value) : null)
             {
             }
         }
