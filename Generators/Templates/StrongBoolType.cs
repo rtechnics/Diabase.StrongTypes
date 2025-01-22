@@ -132,6 +132,13 @@ namespace Diabase.StrongTypes.Templates
             {
             }
         }
+
+        public class NullableStrongValueConverter : ValueConverter<StrongBoolType?, BackingType?>
+        {
+            public NullableStrongValueConverter() : base(v => v, v => v)
+            {
+            }
+        }
 #endif
     }
 

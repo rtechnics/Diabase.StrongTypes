@@ -226,6 +226,13 @@ namespace Diabase.StrongTypes.Templates
             {
             }
         }
+
+        public class NullableStrongValueConverter : ValueConverter<StrongBytesSizeUnit?, BackingType?>
+        {
+            public NullableStrongValueConverter() : base(v => v, v => v)
+            {
+            }
+        }
 #endif
 
 #if INCLUDE_TYPE_CONVERTER && HAS_CONSTRAINT
