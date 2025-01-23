@@ -1,7 +1,7 @@
 ﻿#nullable enable
 
 #define DESIGN_MODE
-#define IMPLICIT_NULL_CONVERSION_DESIGN //_NONE, _EMPTY, _NULL
+#define IMPLICIT_NULL_CONVERSION_DESIGN //_DESIGN, _NONE, _EMPTY, _NULL
 #define SOURCE_IS_NULLABLE
 #define DESTINATION_IS_NULLABLE
 #define EMPTY_AS_NULL
@@ -321,7 +321,7 @@ namespace Diabase.StrongTypes.Templates
 #if INCLUDE_VALUE_CONVERTER
         public class StrongValueConverter : ValueConverter<StrongStringType, string>
         {
-            public StrongValueConverter() : base(v => v, v => v)
+            public StrongValueConverter() : base(v => v, v => v!)
             {
             }
         }
