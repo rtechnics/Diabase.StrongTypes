@@ -243,6 +243,12 @@ namespace Diabase.StrongTypes.Generators.Internal
                             namespaceIdentifier = namespaceDecl.Name.ToString();
                         }
                         break;
+
+                    case FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDecl:
+                        {
+                            namespaceIdentifier = fileScopedNamespaceDecl.Name.ToString();
+                        }
+                        break;
 #if false // for testing
                     case AttributeSyntax attrib:
                         {
