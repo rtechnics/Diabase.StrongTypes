@@ -36,7 +36,7 @@ namespace Diabase.StrongTypes.Generators.Internal
 
         public static string RemoveLinesStartingWith(this string s, string startsWith)
         {
-            var lines = s.AsLines()
+            var lines = s.AsLines() 
                 .Where(l => !l.StartsWith(startsWith));
             return AsDelimited(lines, "\r\n");
         }
@@ -44,7 +44,10 @@ namespace Diabase.StrongTypes.Generators.Internal
 
         public static IEnumerable<string> AsLines(this string s)
         {
-            return s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            return
+                s.Contains("\r\n")
+                ? s.Split(new string[] { "\r\n" }, StringSplitOptions.None)
+                : s.Split('\n');
         }
 
         public static string AsDelimited(IEnumerable<string> items, string delimiter)
