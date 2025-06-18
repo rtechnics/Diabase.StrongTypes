@@ -14,7 +14,9 @@ using System.Reflection;
 namespace Diabase.StrongTypes.Generators.Internal
 {
     [Generator]
+#pragma warning disable RS1042 // Implementations of this interface are not allowed
     internal class StrongTypeGenerator : ISourceGenerator
+#pragma warning restore RS1042 // Implementations of this interface are not allowed
     {
         public void Execute(GeneratorExecutionContext context)
         {
