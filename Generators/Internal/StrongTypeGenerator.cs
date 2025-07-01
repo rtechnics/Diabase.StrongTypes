@@ -15,7 +15,9 @@ namespace Diabase.StrongTypes.Generators.Internal
 {
     [Generator]
 #pragma warning disable RS1042 // Implementations of this interface are not allowed
+#pragma warning disable RS1036 // Specify analyzer banned API enforcement setting
     internal class StrongTypeGenerator : ISourceGenerator
+#pragma warning restore RS1036 // Specify analyzer banned API enforcement setting
 #pragma warning restore RS1042 // Implementations of this interface are not allowed
     {
         public void Execute(GeneratorExecutionContext context)
