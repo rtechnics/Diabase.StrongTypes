@@ -5,6 +5,8 @@
 	  <LangVersion>9.0</LangVersion>
 	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Generators", ""))</RootNamespace>
 	  <Platforms>AnyCPU;x64</Platforms>
+
+	  <!-- for packaging
 	  <IncludeBuildOutput>false</IncludeBuildOutput>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
@@ -14,6 +16,7 @@
 	  <Description>Strong type source generator</Description>
 	  <PackageTags>sourcegenerator;roslyn;csharp</PackageTags>
 	  <RepositoryUrl>https://github.com/rtechnics/Diabase.StrongTypes</RepositoryUrl>
+	  -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
