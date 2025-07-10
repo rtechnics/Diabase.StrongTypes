@@ -1,5 +1,6 @@
 ﻿//#define INTEGRATED_DEBUGGING // use this for integrated debugging
 
+using Diabase.StrongTypes.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;

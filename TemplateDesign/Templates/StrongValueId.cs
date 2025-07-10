@@ -27,12 +27,14 @@ using System.Text.Json.Serialization;
 #if INCLUDE_VALUE_CONVERTER
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 #endif
+using Diabase.StrongTypes.Types;
+
 
 using BackingType = System.Int32;
 
 namespace Diabase.StrongTypes.Templates
 {
-    using Convertible = Diabase.StrongTypes.Convertible;
+    using Convertible = Convertible;
 
 
 #if INCLUDE_JSON_CONVERTER

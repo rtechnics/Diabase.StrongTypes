@@ -4,9 +4,23 @@
 	  <TargetFramework>netstandard2.0</TargetFramework>
 	  <LangVersion>9.0</LangVersion>
 	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Generators", ""))</RootNamespace>
+	  <Platforms>AnyCPU;x64</Platforms>
+	  <IncludeBuildOutput>false</IncludeBuildOutput>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+	  <PackageId>Diabase.StrongTypes</PackageId>
+	  <PackageVersion>1.0.1</PackageVersion>
+	  <Authors>Doug Reece</Authors>
+	  <Description>Strong type source generator</Description>
+	  <PackageTags>sourcegenerator;roslyn;csharp</PackageTags>
+	  <RepositoryUrl>https://github.com/rtechnics/Diabase.StrongTypes</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
@@ -14,7 +28,11 @@
     <DefineConstants>$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+	<ItemGroup>
 	<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
   </ItemGroup>
@@ -42,5 +60,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="copy $(ProjectDir)\..\TemplateDesign\Templates\* $(ProjectDir)\Templates&#xD;&#xA;copy $(ProjectDir)\..\Types\*.cs $(ProjectDir)\Types" />
+  </Target>
 
 </Project>

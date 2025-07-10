@@ -37,11 +37,11 @@ using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
-
 #endif
 #if INCLUDE_VALUE_CONVERTER
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 #endif
+using Diabase.StrongTypes.Types;
 
 
 using BackingType = System.String;
@@ -201,22 +201,22 @@ namespace Diabase.StrongTypes.Templates
 
         // IConvertable
         public TypeCode GetTypeCode() => Type.GetTypeCode(typeof(BackingType));
-        public bool ToBoolean(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, bool>(value, provider);
-        public byte ToByte(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, byte>(value, provider);
-        public char ToChar(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, char>(value, provider);
-        public DateTime ToDateTime(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, DateTime>(value, provider);
-        public decimal ToDecimal(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, decimal>(value, provider);
-        public double ToDouble(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, double>(value, provider);
-        public short ToInt16(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, short>(value, provider);
-        public int ToInt32(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, int>(value, provider);
-        public long ToInt64(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, long>(value, provider);
-        public sbyte ToSByte(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, sbyte>(value, provider);
-        public float ToSingle(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, float>(value, provider);
-        public string ToString(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, string>(value, provider);
-        public object ToType(Type conversionType, IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType(conversionType, value, provider);
-        public ushort ToUInt16(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, ushort>(value, provider);
-        public uint ToUInt32(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, uint>(value, provider);
-        public ulong ToUInt64(IFormatProvider? provider) => Diabase.StrongTypes.Convertible.ToType<BackingType, ulong>(value, provider);
+        public bool ToBoolean(IFormatProvider? provider) => Convertible.ToType<BackingType, bool>(value, provider);
+        public byte ToByte(IFormatProvider? provider) => Convertible.ToType<BackingType, byte>(value, provider);
+        public char ToChar(IFormatProvider? provider) => Convertible.ToType<BackingType, char>(value, provider);
+        public DateTime ToDateTime(IFormatProvider? provider) => Convertible.ToType<BackingType, DateTime>(value, provider);
+        public decimal ToDecimal(IFormatProvider? provider) => Convertible.ToType<BackingType, decimal>(value, provider);
+        public double ToDouble(IFormatProvider? provider) => Convertible.ToType<BackingType, double>(value, provider);
+        public short ToInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, short>(value, provider);
+        public int ToInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, int>(value, provider);
+        public long ToInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, long>(value, provider);
+        public sbyte ToSByte(IFormatProvider? provider) => Convertible.ToType<BackingType, sbyte>(value, provider);
+        public float ToSingle(IFormatProvider? provider) => Convertible.ToType<BackingType, float>(value, provider);
+        public string ToString(IFormatProvider? provider) => Convertible.ToType<BackingType, string>(value, provider);
+        public object ToType(Type conversionType, IFormatProvider? provider) => Convertible.ToType(conversionType, value, provider);
+        public ushort ToUInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, ushort>(value, provider);
+        public uint ToUInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, uint>(value, provider);
+        public ulong ToUInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, ulong>(value, provider);
 
 #if INCLUDE_EMPTY_VALUE
         public static readonly StrongStringType Empty = new();
@@ -243,16 +243,16 @@ namespace Diabase.StrongTypes.Templates
         readonly BackingType value;
 
 #if HAS_CONSTRAINT
-        public Diabase.StrongTypes.ConstraintException? ValidationException { get; private set; }
+        public ConstraintException? ValidationException { get; private set; }
         public bool IsValid => ValidationException is null;
 
-        Diabase.StrongTypes.ConstraintException? Validate(BackingType? value)
+        ConstraintException? Validate(BackingType? value)
         {
 #if CONSTRAINT_REQUIRED
-            if (string.IsNullOrEmpty(value)) return new Diabase.StrongTypes.RequiredConstraintException();
+            if (string.IsNullOrEmpty(value)) return new Diabase.StrongTypes.Types.RequiredConstraintException();
 #endif
 #if CONSTRAINT_REGEX
-            if (!string.IsNullOrEmpty(value) && !ConstraintRegEx.IsMatch(value)) return new Diabase.StrongTypes.RegexConstraintException();
+            if (!string.IsNullOrEmpty(value) && !ConstraintRegEx.IsMatch(value)) return new Diabase.StrongTypes.Types.RegexConstraintException();
 #endif
 #if CONSTRAINT_CUSTOM
             if (!CustomValidate(value, out var exception)) return exception;
@@ -264,7 +264,7 @@ namespace Diabase.StrongTypes.Templates
 #if DESIGN_MODE
         static Regex ConstraintRegEx = new(".*");
 
-        static bool CustomValidate(BackingType? _, out Diabase.StrongTypes.ConstraintException? exception)
+        static bool CustomValidate(BackingType? _, out ConstraintException? exception)
         {
             exception = null;
             return true;

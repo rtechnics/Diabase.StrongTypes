@@ -1,4 +1,5 @@
-﻿using Diabase.StrongTypes.Units;
+﻿using Diabase.StrongTypes.Types;
+using Diabase.StrongTypes.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;

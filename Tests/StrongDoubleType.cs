@@ -1,4 +1,6 @@
-﻿namespace Diabase.StrongTypes.Tests
+﻿using Diabase.StrongTypes.Types;
+
+namespace Diabase.StrongTypes.Tests
 {
     [TestClass]
     public class StrongDoubleType

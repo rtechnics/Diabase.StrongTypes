@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Diabase.StrongTypes.Types;
+using System.Text.RegularExpressions;
 
 namespace Diabase.StrongTypes.Tests
 {
