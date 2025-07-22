@@ -65,7 +65,7 @@
   </ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="copy $(ProjectDir)\..\TemplateDesign\Templates\* $(ProjectDir)\Templates&#xD;&#xA;copy $(ProjectDir)\..\Types\*.cs $(ProjectDir)\Types" />
+    <Exec Command="copy $(ProjectDir)\..\TemplateDesign\Templates\* $(ProjectDir)\Templates&#xD;&#xA;copy $(ProjectDir)\..\Types\*.cs $(ProjectDir)\Types&#xD;&#xA;mkdir $(ProjectDir)\Types\BytesSizeUnits&#xD;&#xA;copy $(ProjectDir)\..\Types\BytesSizeUnits\*.cs $(ProjectDir)\Types\BytesSizeUnits" />
   </Target>
 
 </Project>
