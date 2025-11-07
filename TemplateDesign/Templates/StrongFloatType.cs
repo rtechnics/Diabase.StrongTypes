@@ -163,12 +163,25 @@ namespace Diabase.StrongTypes.Templates
 #if !USE_CUSTOM_CONVERTER || DESIGN_MODE
             public override StrongFloatType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                return new(BackingType.Parse(reader.GetString()!));
+                var allowReadingFromString = options.NumberHandling.HasFlag(JsonNumberHandling.AllowReadingFromString);
+                return (reader.TokenType, allowReadingFromString) switch
+                {
+                    (JsonTokenType.String, true) => new(BackingType.Parse(reader.GetString()!)),
+                    (JsonTokenType.Number, _) => new((BackingType)reader.GetDouble()),
+                    _ => throw new JsonException(),
+                };
             }
 
             public override void Write(Utf8JsonWriter writer, StrongFloatType value, JsonSerializerOptions options)
             {
-                writer.WriteStringValue(value.ToString());
+                if (options.NumberHandling.HasFlag(JsonNumberHandling.WriteAsString))
+                {
+                    writer.WriteStringValue(value.ToString());
+                }
+                else
+                {
+                    writer.WriteNumberValue(value);
+                }
             }
 #endif
         }

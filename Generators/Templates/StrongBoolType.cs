@@ -89,12 +89,12 @@ namespace Diabase.StrongTypes.Templates
 #if !USE_CUSTOM_CONVERTER || DESIGN_MODE
             public override StrongBoolType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                return new(BackingType.Parse(reader.GetString()!));
+                return new(reader.GetBoolean());
             }
 
             public override void Write(Utf8JsonWriter writer, StrongBoolType value, JsonSerializerOptions options)
             {
-                writer.WriteStringValue(value.ToString());
+                writer.WriteBooleanValue(value);
             }
 #endif
         }
