@@ -32,14 +32,22 @@ namespace Diabase.StrongTypes.Templates
 #endif
     internal readonly partial struct StrongReferenceId : IEquatable<StrongReferenceId>, IComparable<StrongReferenceId>, IComparable, IConvertible
     {
-        public override string? ToString() => value.ToString();
+        public override string? ToString() => value?.ToString();
 
-        public bool Equals(StrongReferenceId other) => value.Equals(other.value);
-        public override bool Equals(object? obj) => obj is StrongReferenceId strongId ? value.Equals(strongId.value) : value.Equals(obj);
-        public override int GetHashCode() => value.GetHashCode();
-        public int CompareTo(StrongReferenceId other) => value.CompareTo(other.value);
-        public int CompareTo(object? obj) => obj is StrongReferenceId strongId ? value.CompareTo(strongId.value) : value.CompareTo(obj);
-        public static implicit operator BackingType(StrongReferenceId value) => value.value;
+        public bool Equals(StrongReferenceId other) => Equals(value, other.value);
+        public override bool Equals(object? obj) => obj is StrongReferenceId strongId ? Equals(value, strongId.value) : Equals(value, obj);
+        public override int GetHashCode() => value?.GetHashCode() ?? 0;
+        public int CompareTo(StrongReferenceId other) => 
+            value is not null && other.value is not null
+                ? value.CompareTo(other.value)
+                : value is null
+                    ? other.value is null ? 0 : -1
+                    : 1;
+        public int CompareTo(object? obj) => obj is StrongReferenceId strongId ? CompareTo(strongId) : 
+            value is not null
+                ? value.CompareTo(obj)
+                : obj is null ? 0 : -1;
+        public static implicit operator BackingType(StrongReferenceId value) => value.value!;
         public static implicit operator StrongReferenceId(BackingType value) => new(value);
         public static implicit operator StrongReferenceId?(BackingType? value) => value is not null ? new(value) : null;
 
@@ -54,29 +62,29 @@ namespace Diabase.StrongTypes.Templates
 
         // IConvertable
         public TypeCode GetTypeCode() => Type.GetTypeCode(typeof(BackingType));
-        public bool ToBoolean(IFormatProvider? provider) => Convertible.ToType<BackingType, bool>(value, provider);
-        public byte ToByte(IFormatProvider? provider) => Convertible.ToType<BackingType, byte>(value, provider);
-        public char ToChar(IFormatProvider? provider) => Convertible.ToType<BackingType, char>(value, provider);
-        public DateTime ToDateTime(IFormatProvider? provider) => Convertible.ToType<BackingType, DateTime>(value, provider);
-        public decimal ToDecimal(IFormatProvider? provider) => Convertible.ToType<BackingType, decimal>(value, provider);
-        public double ToDouble(IFormatProvider? provider) => Convertible.ToType<BackingType, double>(value, provider);
-        public short ToInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, short>(value, provider);
-        public int ToInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, int>(value, provider);
-        public long ToInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, long>(value, provider);
-        public sbyte ToSByte(IFormatProvider? provider) => Convertible.ToType<BackingType, sbyte>(value, provider);
-        public float ToSingle(IFormatProvider? provider) => Convertible.ToType<BackingType, float>(value, provider);
-        public string ToString(IFormatProvider? provider) => Convertible.ToType<BackingType, string>(value, provider);
+        public bool ToBoolean(IFormatProvider? provider) => Convertible.ToType<BackingType, bool>(value!, provider);
+        public byte ToByte(IFormatProvider? provider) => Convertible.ToType<BackingType, byte>(value!, provider);
+        public char ToChar(IFormatProvider? provider) => Convertible.ToType<BackingType, char>(value!, provider);
+        public DateTime ToDateTime(IFormatProvider? provider) => Convertible.ToType<BackingType, DateTime>(value!, provider);
+        public decimal ToDecimal(IFormatProvider? provider) => Convertible.ToType<BackingType, decimal>(value!, provider);
+        public double ToDouble(IFormatProvider? provider) => Convertible.ToType<BackingType, double>(value!, provider);
+        public short ToInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, short>(value!, provider);
+        public int ToInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, int>(value!, provider);
+        public long ToInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, long>(value!, provider);
+        public sbyte ToSByte(IFormatProvider? provider) => Convertible.ToType<BackingType, sbyte>(value!, provider);
+        public float ToSingle(IFormatProvider? provider) => Convertible.ToType<BackingType, float>(value!, provider);
+        public string ToString(IFormatProvider? provider) => Convertible.ToType<BackingType, string>(value!, provider);
         public object ToType(Type conversionType, IFormatProvider? provider) => Convertible.ToType(conversionType, value, provider);
-        public ushort ToUInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, ushort>(value, provider);
-        public uint ToUInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, uint>(value, provider);
-        public ulong ToUInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, ulong>(value, provider);
+        public ushort ToUInt16(IFormatProvider? provider) => Convertible.ToType<BackingType, ushort>(value!, provider);
+        public uint ToUInt32(IFormatProvider? provider) => Convertible.ToType<BackingType, uint>(value!, provider);
+        public ulong ToUInt64(IFormatProvider? provider) => Convertible.ToType<BackingType, ulong>(value!, provider);
 
         StrongReferenceId(BackingType value)
         {
             this.value = value;
         }
 
-        readonly BackingType value;
+        readonly BackingType? value;
 
 #if INCLUDE_JSON_CONVERTER
         public partial class ThisJsonConverter : JsonConverter<StrongReferenceId>
