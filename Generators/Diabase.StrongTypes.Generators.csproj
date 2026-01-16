@@ -64,8 +64,19 @@
     </EmbeddedResource>
   </ItemGroup>
 
-	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="copy $(ProjectDir)\..\TemplateDesign\Templates\* $(ProjectDir)\Templates&#xD;&#xA;copy $(ProjectDir)\..\Types\*.cs $(ProjectDir)\Types&#xD;&#xA;mkdir $(ProjectDir)\Types\BytesSizeUnits&#xD;&#xA;copy $(ProjectDir)\..\Types\BytesSizeUnits\*.cs $(ProjectDir)\Types\BytesSizeUnits" />
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="cp -R '$(ProjectDir)../TemplateDesign/Templates/'* '$(ProjectDir)Templates/'" 
+          Condition="'$([MSBuild]::IsOSPlatform(&quot;OSX&quot;))' OR '$([MSBuild]::IsOSPlatform(&quot;Linux&quot;))'" />
+    <Exec Command="cp -R '$(ProjectDir)../Types/'*.cs '$(ProjectDir)Types/'" 
+          Condition="'$([MSBuild]::IsOSPlatform(&quot;OSX&quot;))' OR '$([MSBuild]::IsOSPlatform(&quot;Linux&quot;))'" />
+    <Exec Command="mkdir -p '$(ProjectDir)Types/BytesSizeUnits' &amp;&amp; cp -R '$(ProjectDir)../Types/BytesSizeUnits/'*.cs '$(ProjectDir)Types/BytesSizeUnits/'" 
+          Condition="'$([MSBuild]::IsOSPlatform(&quot;OSX&quot;))' OR '$([MSBuild]::IsOSPlatform(&quot;Linux&quot;))'" />
+    <Exec Command="copy /Y &quot;$(ProjectDir)..\TemplateDesign\Templates\*&quot; &quot;$(ProjectDir)Templates&quot;" 
+          Condition="'$([MSBuild]::IsOSPlatform(&quot;Windows&quot;))'" />
+    <Exec Command="copy /Y &quot;$(ProjectDir)..\Types\*.cs&quot; &quot;$(ProjectDir)Types&quot;" 
+          Condition="'$([MSBuild]::IsOSPlatform(&quot;Windows&quot;))'" />
+    <Exec Command="if not exist &quot;$(ProjectDir)Types\BytesSizeUnits&quot; mkdir &quot;$(ProjectDir)Types\BytesSizeUnits&quot; &amp; copy /Y &quot;$(ProjectDir)..\Types\BytesSizeUnits\*.cs&quot; &quot;$(ProjectDir)Types\BytesSizeUnits&quot;" 
+          Condition="'$([MSBuild]::IsOSPlatform(&quot;Windows&quot;))'" />
   </Target>
 
 </Project>
