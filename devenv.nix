@@ -12,6 +12,10 @@
     };
   };
   config = {
+    packages = [
+      pkgs.wrkflw
+      pkgs.yaml-language-server
+    ];
     languages.dotnet = {
       enable = true;
       package = pkgs.dotnetCorePackages."sdk_${config.languages.dotnet.packageSuffix}";
@@ -23,12 +27,16 @@
           enable = true;
           strict = true;
         };
+        pinact.enable = true;
         shfmt.enable = true;
+        yamlfmt.enable = true;
       };
     };
     git-hooks.hooks = {
+      actionlint.enable = true;
       flake-checker.enable = true;
       shellcheck.enable = true;
+      yamllint.enable = true;
     };
   };
 }
