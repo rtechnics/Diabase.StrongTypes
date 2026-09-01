@@ -34,11 +34,25 @@
   };
   outputs =
     inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      { ... }: {
-        imports = [ inputs.devenv.flakeModule ];
-        systems = inputs.nixpkgs.lib.systems.flakeExposed;
-        perSystem.devenv.shells.default = import ./devenv.nix;
-      }
-    );
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ inputs.devenv.flakeModule ];
+      systems = inputs.nixpkgs.lib.systems.flakeExposed;
+      perSystem = { config, pkgs, ... }: {
+        devenv.shells.default = import ./devenv.nix;
+        packages = {
+          default = config.packages.diabase-strongtypes;
+          # TODO: To finish packing with Nix, we would need to follow the instructions to package the Nuget dependencies:
+          # https://nixos.org/manual/nixpkgs/unstable/#generating-and-updating-nuget-dependencies
+          diabase-strongtypes = pkgs.buildDotnetModule {
+            name = "Diabase.StrongTypes";
+            src = ./.;
+            packNupkg = true;
+            dotnet-sdk =
+              pkgs.dotnetCorePackages."sdk_${config.devenv.shells.default.languages.dotnet.packageSuffix}";
+            dotnet-runtime =
+              pkgs.dotnetCorePackages."runtime_${config.devenv.shells.default.languages.dotnet.packageSuffix}";
+          };
+        };
+      };
+    };
 }
