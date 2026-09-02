@@ -13,12 +13,19 @@
   };
   config = {
     packages = [
-      pkgs.wrkflw
+      # wrkflw also exists as an actions runner, but it has the following issues:
+      # - https://github.com/bahdotsh/wrkflw/pull/123 - Needs GITHUB_ACTION_PATH set
+      # - https://github.com/bahdotsh/wrkflw/issues/113 - Uses hard-coded images that lose compatibility with GitHub Actions
+      pkgs.act
       pkgs.yaml-language-server
     ];
-    languages.dotnet = {
-      enable = true;
-      package = pkgs.dotnetCorePackages."sdk_${config.languages.dotnet.packageSuffix}";
+    languages = {
+      dotnet = {
+        enable = true;
+        package = pkgs.dotnetCorePackages."sdk_${config.languages.dotnet.packageSuffix}";
+      };
+      nix.enable = true;
+      shell.enable = true;
     };
     treefmt = {
       enable = true;

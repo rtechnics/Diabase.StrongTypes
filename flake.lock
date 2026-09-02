@@ -67,7 +67,7 @@
           "nixd"
         ],
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-devenv"
         ],
         "rust-overlay": "rust-overlay"
       },
@@ -157,7 +157,7 @@
       "inputs": {
         "flake-compat": "flake-compat_2",
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-devenv"
         ]
       },
       "locked": {
@@ -220,7 +220,7 @@
           "flake-parts"
         ],
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-devenv"
         ],
         "treefmt-nix": "treefmt-nix"
       },
@@ -254,6 +254,42 @@
         "type": "github"
       }
     },
+    "nixpkgs-devenv": {
+      "inputs": {
+        "nixpkgs-src": "nixpkgs-src"
+      },
+      "locked": {
+        "lastModified": 1787753358,
+        "narHash": "sha256-Tl77VbWyAKrOfRNQhL6JbQtb/MLzbYa/1RG1gWWfICk=",
+        "owner": "cachix",
+        "repo": "devenv-nixpkgs",
+        "rev": "256551e45f6303e142ab4a98be1bf243feb77dc0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cachix",
+        "ref": "rolling",
+        "repo": "devenv-nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787394516,
+        "narHash": "sha256-pRGOQSClnXNI2iLUG6DYpsGvYcuw0drOutVZFTJNw90=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "c8f90650c15282fa8656a041bfbbd2403997a9a7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "devenv": "devenv",
@@ -261,6 +297,7 @@
         "git-hooks-nix": "git-hooks-nix",
         "nixd": "nixd",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-devenv": "nixpkgs-devenv",
         "treefmt-nix": "treefmt-nix_2"
       }
     },
@@ -309,7 +346,7 @@
     "treefmt-nix_2": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-devenv"
         ]
       },
       "locked": {
