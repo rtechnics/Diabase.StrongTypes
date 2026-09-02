@@ -354,3 +354,6 @@ MigrationBackup/
 .direnv
 .pre-commit-config.yaml
 result*
+
+# act (GitHub Actions runner)
+.artifacts
