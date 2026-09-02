@@ -16,12 +16,7 @@
       # wrkflw also exists as an actions runner, but it has the following issues:
       # - https://github.com/bahdotsh/wrkflw/pull/123 - Needs GITHUB_ACTION_PATH set
       # - https://github.com/bahdotsh/wrkflw/issues/113 - Uses hard-coded images that lose compatibility with GitHub Actions
-
-      # The act documentation uses the .artifacts directory
-      (pkgs.writeShellScriptBin "act" ''
-        "${lib.getExe pkgs.act}" --artifact-server-path "$DEVENV_ROOT/.artifacts" $@
-      '')
-
+      pkgs.act
       pkgs.yaml-language-server
     ];
     languages = {
