@@ -8,7 +8,11 @@
   options = {
     languages.dotnet.packageSuffix = lib.mkOption {
       type = lib.types.str;
-      default = "9_0";
+      default =
+        let
+          version = (builtins.fromJSON (builtins.readFile ./global.json)).sdk.version;
+        in
+        "${lib.versions.major version}_${lib.versions.minor version}";
     };
   };
   config = {
@@ -17,6 +21,7 @@
       dotnet = {
         enable = true;
         package = pkgs.dotnetCorePackages."sdk_${config.languages.dotnet.packageSuffix}";
+        lsp.package = pkgs.omnisharp-roslyn;
       };
       nix.enable = true;
       shell.enable = true;
@@ -29,16 +34,18 @@
     packages = [
       pkgs.docker-compose-language-service
       pkgs.podman-compose
+      pkgs.vscode-json-languageserver
       pkgs.yaml-language-server
     ];
     treefmt = {
       enable = true;
       config.programs = {
+        # formatjson5.enable = true; # Disabled due to machine-generated files
         nixfmt = {
           enable = true;
           strict = true;
         };
-        pinact.enable = true;
+        # pinact.enable = true; # Should automate this
         shfmt.enable = true;
         yamlfmt = {
           enable = true;
@@ -53,9 +60,20 @@
     };
     git-hooks.hooks = {
       actionlint.enable = true;
+      # check-json.enable = true; # Disabled due to machine-generated files
       flake-checker.enable = true;
       shellcheck.enable = true;
-      yamllint.enable = true;
+      yamllint = {
+        enable = true;
+        # actionslint does not support explicit YAML version declarations
+        settings.configuration = ''
+          ---
+          extends: default
+          rules:
+            truthy:
+              check-keys: false
+        '';
+      };
     };
   };
 }
