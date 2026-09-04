@@ -1,6 +1,5 @@
 { config, pkgs, ... }: {
   name = "diabase-strongtypes-actions";
-  packages = [ pkgs.act ];
   containers.shell = {
     name = "${config.name}-shell";
     copyToRoot = pkgs.linkFarm "actions-env" [
@@ -9,6 +8,9 @@
         path = ./.actrc.container-linux;
       }
     ];
-    layers = [ { copyToRoot = [ pkgs.dockerTools.caCertificates ]; } ];
+    layers = [
+      { copyToRoot = [ pkgs.dockerTools.caCertificates ]; }
+      { copyToRoot = [ pkgs.act ]; }
+    ];
   };
 }
