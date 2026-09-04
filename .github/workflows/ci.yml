@@ -1,16 +1,19 @@
 ---
-name: Release
+name: CI
 on:
   push:
     tags:
       - 'v*.*.*'
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 permissions:
   contents: read
 jobs:
-  nuget:
-    name: Nuget
+  ci:
+    name: CI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -42,18 +45,20 @@ jobs:
       - name: Run tests
         run: dotnet test Tests --no-build --configuration Release
       - name: Build package
+        if: github.event_name == 'push'
         run: |
           dotnet pack Generators \
           --no-build --configuration Release \
           --property:PackageVersion=${{ steps.get-version.outputs.version }} \
           --output ./out/share
       - name: Publish to Nuget registry
+        if: github.event_name == 'push'
         run: |
           dotnet nuget push ./out/share/*.nupkg \
           --skip-duplicate --source https://api.nuget.org/v3/index.json
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
-        if: github.ref_type == 'tag'
+        if: github.event_name == 'push' && github.ref_type == 'tag'
         with:
           working_directory: ./out/share
           files: ./*
