@@ -12,13 +12,7 @@
     };
   };
   config = {
-    packages = [
-      # wrkflw also exists as an actions runner, but it has the following issues:
-      # - https://github.com/bahdotsh/wrkflw/pull/123 - Needs GITHUB_ACTION_PATH set
-      # - https://github.com/bahdotsh/wrkflw/issues/113 - Uses hard-coded images that lose compatibility with GitHub Actions
-      pkgs.act
-      pkgs.yaml-language-server
-    ];
+    name = "diabase-strongtypes";
     languages = {
       dotnet = {
         enable = true;
@@ -27,6 +21,19 @@
       nix.enable = true;
       shell.enable = true;
     };
+    scripts = {
+      actions = {
+        exec = ''
+          ${lib.getExe pkgs.nix} run .#actions-container-act.copyToPodman --impure --accept-flake-config
+          ${lib.getExe pkgs.podman-compose} -f compose.actions_linux.yaml run --rm act
+        '';
+      };
+    };
+    packages = [
+      pkgs.docker-compose-language-service
+      pkgs.podman-compose
+      pkgs.yaml-language-server
+    ];
     treefmt = {
       enable = true;
       config.programs = {

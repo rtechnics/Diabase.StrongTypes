@@ -29,6 +29,11 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs-devenv";
     };
+    mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixd = {
       url = "github:nix-community/nixd";
       inputs = {
@@ -49,7 +54,10 @@
       imports = [ inputs.devenv.flakeModule ];
       systems = inputs.nixpkgs.lib.systems.flakeExposed;
       perSystem = { config, pkgs, ... }: {
-        devenv.shells.default = import ./devenv.nix;
+        devenv.shells = {
+          default = import ./devenv.nix;
+          actions = import ./devenv.actions.nix;
+        };
         packages = {
           default = config.packages.diabase-strongtypes;
           # TODO: To finish packing with Nix, we would need to follow the instructions to package the Nuget dependencies:

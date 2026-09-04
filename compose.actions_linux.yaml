@@ -1,0 +1,23 @@
+---
+name: diabase-strongtypes-actions
+networks:
+  diabase-strongtypes-actions:
+    name: diabase-strongtypes-actions
+    driver: bridge
+services:
+  act:
+    image: diabase-strongtypes-actions-act:latest
+    container_name: act
+    networks:
+      - diabase-strongtypes-actions
+    user: "0"
+    volumes:
+      - ${XDG_RUNTIME_DIR}/podman/podman.sock:${XDG_RUNTIME_DIR}/podman/podman.sock
+      - ${XDG_CACHE_HOME}/act:/env/.cache/act
+      - ${XDG_CACHE_HOME}/actcache:/env/.cache/actcache
+      - .artifacts:/env/repo/.artifacts
+      - .:/env/repo:ro
+    environment:
+      DOCKER_HOST: unix://${XDG_RUNTIME_DIR}/podman/podman.sock
+    command: bash
+    working_dir: /env/repo
