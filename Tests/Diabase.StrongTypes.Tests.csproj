@@ -9,6 +9,7 @@
     <IsPackable>false</IsPackable>
     <Platforms>AnyCPU;x64</Platforms>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RuntimeIdentifiers>linux-x64;linux-arm64;win-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
