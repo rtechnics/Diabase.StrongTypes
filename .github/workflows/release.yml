@@ -1,0 +1,59 @@
+---
+name: Release
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+    branches:
+      - master
+permissions:
+  contents: read
+jobs:
+  nuget:
+    name: Nuget
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Get version from tag
+        id: get-version
+        run: |
+          VERSION="$(git describe --tags --match "v*.*.*")"
+          echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
+      - name: Set up dotnet CLI
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: ./*/packages.lock.json
+      - name: Fetch dependencies
+        run: |
+          dotnet restore Generators --locked-mode
+          dotnet restore Tests --locked-mode
+      - name: Build project
+        run: |
+          dotnet build Generators \
+            --no-restore --configuration Release \
+            --property:Version=${{ steps.get-version.outputs.version }}
+      - name: Build tests
+        run: |
+          dotnet build Tests \
+            --no-restore --no-dependencies --configuration Release
+      - name: Run tests
+        run: dotnet test Tests --no-build --configuration Release
+      - name: Build package
+        run: |
+          dotnet pack Generators \
+          --no-build --configuration Release \
+          --property:PackageVersion=${{ steps.get-version.outputs.version }} \
+          --output ./out/share
+      - name: Publish to Nuget registry
+        run: |
+          dotnet nuget push ./out/share/*.nupkg \
+          --skip-duplicate --source https://api.nuget.org/v3/index.json
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v3
+        if: github.ref_type == 'tag'
+        with:
+          working_directory: ./out/share
+          files: ./*
