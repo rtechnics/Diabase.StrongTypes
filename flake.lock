@@ -325,6 +325,26 @@
         "type": "github"
       }
     },
+    "nuget-packageslock2nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787989245,
+        "narHash": "sha256-jgmA3tUMJVECqiu6BxtL/zzJQKqbkarLZ8YSSGJ5G44=",
+        "owner": "mdarocha",
+        "repo": "nuget-packageslock2nix",
+        "rev": "22e1feaf7c2e3815579566929a4474ff05c19b2d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mdarocha",
+        "repo": "nuget-packageslock2nix",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "devenv": "devenv",
@@ -335,6 +355,7 @@
         "nixd": "nixd",
         "nixpkgs": "nixpkgs",
         "nixpkgs-devenv": "nixpkgs-devenv",
+        "nuget-packageslock2nix": "nuget-packageslock2nix",
         "treefmt-nix": "treefmt-nix_2"
       }
     },

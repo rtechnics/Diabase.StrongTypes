@@ -43,6 +43,10 @@
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-devenv.url = "github:cachix/devenv-nixpkgs/rolling";
+    nuget-packageslock2nix = {
+      url = "github:mdarocha/nuget-packageslock2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs-devenv";
@@ -53,25 +57,44 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [ inputs.devenv.flakeModule ];
       systems = inputs.nixpkgs.lib.systems.flakeExposed;
-      perSystem = { config, pkgs, ... }: {
-        devenv.shells = {
-          default = import ./devenv.nix;
-          actions = import ./devenv.actions.nix;
-        };
-        packages = {
-          default = config.packages.diabase-strongtypes;
-          # TODO: To finish packing with Nix, we would need to follow the instructions to package the Nuget dependencies:
-          # https://nixos.org/manual/nixpkgs/unstable/#generating-and-updating-nuget-dependencies
-          diabase-strongtypes = pkgs.buildDotnetModule {
-            name = "Diabase.StrongTypes";
-            src = ./.;
-            packNupkg = true;
-            dotnet-sdk =
-              pkgs.dotnetCorePackages."sdk_${config.devenv.shells.default.languages.dotnet.packageSuffix}";
-            dotnet-runtime =
-              pkgs.dotnetCorePackages."runtime_${config.devenv.shells.default.languages.dotnet.packageSuffix}";
+      perSystem =
+        {
+          config,
+          pkgs,
+          system,
+          ...
+        }:
+        {
+          devenv.shells = {
+            default = import ./devenv.nix;
+            actions = import ./devenv.actions.nix;
+          };
+          packages = {
+            generators = pkgs.buildDotnetModule (
+              let
+                name = "Diabase.StrongTypes.Generators";
+              in
+              {
+                inherit name;
+                pname = name;
+                src = ./.;
+                projectFile = "./Generators/Diabase.StrongTypes.Generators.csproj";
+                testProjectFile = "./Tests/Diabase.StrongTypes.Tests.csproj";
+                packNupkg = true;
+                dotnet-sdk =
+                  pkgs.dotnetCorePackages."sdk_${config.devenv.shells.default.languages.dotnet.packageSuffix}";
+                dotnet-runtime =
+                  pkgs.dotnetCorePackages."runtime_${config.devenv.shells.default.languages.dotnet.packageSuffix}";
+                nugetDeps = inputs.nuget-packageslock2nix.lib {
+                  inherit name system;
+                  lockfiles = [
+                    ./Generators/packages.lock.json
+                    ./Tests/packages.lock.json
+                  ];
+                };
+              }
+            );
           };
         };
-      };
     };
 }
