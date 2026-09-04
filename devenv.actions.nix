@@ -1,7 +1,8 @@
-{ pkgs, ... }: {
+{ config, pkgs, ... }: {
   name = "diabase-strongtypes-actions";
   packages = [ pkgs.act ];
-  containers.act = {
+  containers.shell = {
+    name = "${config.name}-shell";
     copyToRoot = pkgs.linkFarm "actions-env" [
       {
         name = ".config/act/actrc";

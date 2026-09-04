@@ -5,9 +5,9 @@ networks:
     name: diabase-strongtypes-actions
     driver: bridge
 services:
-  act:
-    image: diabase-strongtypes-actions-act:latest
-    container_name: act
+  shell:
+    image: diabase-strongtypes-actions-shell:latest
+    container_name: shell
     networks:
       - diabase-strongtypes-actions
     user: "0"
@@ -19,5 +19,4 @@ services:
       - .:/env/repo:ro
     environment:
       DOCKER_HOST: unix://${XDG_RUNTIME_DIR}/podman/podman.sock
-    command: bash
     working_dir: /env/repo
