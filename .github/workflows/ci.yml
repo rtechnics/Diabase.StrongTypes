@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          fetch-tags: true
       - name: Get version from tag
         id: get-version
         run: |
