@@ -85,7 +85,7 @@ jobs:
         uses: NuGet/login@v1
         id: nuget-login
         with:
-          user: rtechnics
+          user: ${{ secrets.NUGET_USER }}
       - name: Publish to Nuget registry
         run: |
           dotnet nuget push ./share/nuget/source/**/*.nupkg \
