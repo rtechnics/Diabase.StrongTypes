@@ -33,12 +33,13 @@ jobs:
       - name: Fetch dependencies
         run: |
           dotnet restore Generators --locked-mode
-          dotnet restore Tests --locked-mode
+          dotnet restore Tests \
+            --locked-mode --no-dependencies --use-current-runtime
       - name: Build project
         run: |
           dotnet build Generators \
             --no-restore --configuration Release \
-            --property:Version=${{ steps.get-version.outputs.version }}
+            --property:Version="${{ steps.get-version.outputs.version }}"
       - name: Build tests
         run: |
           dotnet build Tests \
@@ -49,10 +50,10 @@ jobs:
         run: |
           dotnet pack Generators \
           --no-build --configuration Release \
-          --property:PackageVersion=${{ steps.get-version.outputs.version }} \
-          --output ./dist/share/nuget/source/\
+          --property:PackageVersion="${{ steps.get-version.outputs.version }}" \
+          --output "./dist/share/nuget/source/\
             Diabase.StrongTypes.Generators/\
-            ${{ steps.get-version.outputs.version }}
+            ${{ steps.get-version.outputs.version }}"
       - name: Upload package
         uses: actions/upload-artifact@v7
         with:
@@ -78,7 +79,7 @@ jobs:
         run: |
           dotnet nuget push ./share/nuget/source/**/*.nupkg \
           --skip-duplicate --source https://api.nuget.org/v3/index.json \
-          --api-key ${{steps.nuget-login.outputs.NUGET_API_KEY}}
+          --api-key "${{steps.nuget-login.outputs.NUGET_API_KEY}}"
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         if: github.ref_type == 'tag'

@@ -116,6 +116,17 @@
           "System.Runtime.CompilerServices.Unsafe": "4.5.3"
         }
       }
-    }
+    },
+    ".NETStandard,Version=v2.0/android-arm": {},
+    ".NETStandard,Version=v2.0/android-arm64": {},
+    ".NETStandard,Version=v2.0/ios-arm64": {},
+    ".NETStandard,Version=v2.0/iossimulator-arm64": {},
+    ".NETStandard,Version=v2.0/linux-arm64": {},
+    ".NETStandard,Version=v2.0/linux-x64": {},
+    ".NETStandard,Version=v2.0/osx": {},
+    ".NETStandard,Version=v2.0/osx-arm64": {},
+    ".NETStandard,Version=v2.0/osx-x64": {},
+    ".NETStandard,Version=v2.0/win-arm64": {},
+    ".NETStandard,Version=v2.0/win-x64": {}
   }
 }
