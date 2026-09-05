@@ -53,6 +53,7 @@
             formatter = {
               type = "basic";
               include_document_start = true; # yamllint fails without this
+              pad_line_comments = 2; # Required by yamllint
             };
           };
         };
