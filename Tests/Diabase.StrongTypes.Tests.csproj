@@ -8,6 +8,8 @@
     <!-- <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath> -->
     <IsPackable>false</IsPackable>
     <Platforms>AnyCPU;x64</Platforms>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RuntimeIdentifiers>linux-arm64;linux-x64;win-arm64;win-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

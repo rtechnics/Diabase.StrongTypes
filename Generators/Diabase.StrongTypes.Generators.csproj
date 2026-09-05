@@ -1,22 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>netstandard2.0</TargetFramework>
-	  <LangVersion>9.0</LangVersion>
-	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Generators", ""))</RootNamespace>
-	  <Platforms>AnyCPU;x64</Platforms>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Generators", ""))</RootNamespace>
+    <Platforms>AnyCPU;x64</Platforms>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RuntimeIdentifiers>android-arm;android-arm64;ios-arm64;iossimulator-arm64;linux-arm64;linux-x64;osx;osx-arm64;osx-x64;win-arm64;win-x64</RuntimeIdentifiers>
 
-	  <!-- for packaging
-	  <IncludeBuildOutput>false</IncludeBuildOutput>
-	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!-- See setup-dotnet GitHub Actions workflow documentation -->
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder> 
 
-	  <PackageId>Diabase.StrongTypes</PackageId>
-	  <PackageVersion>1.0.1</PackageVersion>
-	  <Authors>Doug Reece</Authors>
-	  <Description>Strong type source generator</Description>
-	  <PackageTags>sourcegenerator;roslyn;csharp</PackageTags>
-	  <RepositoryUrl>https://github.com/rtechnics/Diabase.StrongTypes</RepositoryUrl>
-	  -->
+    <PackageId>Diabase.StrongTypes.Generators</PackageId>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Authors>R-Technics</Authors>
+    <Description>Strong type source generator</Description>
+    <PackageTags>sourcegenerator;roslyn;csharp</PackageTags>
+    <RepositoryUrl>https://github.com/rtechnics/Diabase.StrongTypes</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,9 +36,9 @@
     <DefineConstants>$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
-	<ItemGroup>
-	<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
-	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
   </ItemGroup>
 
   <ItemGroup>

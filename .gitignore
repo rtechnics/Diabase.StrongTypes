@@ -348,3 +348,12 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Nix
+.devenv
+.direnv
+.pre-commit-config.yaml
+result*
+
+# act (GitHub Actions runner)
+**/.artifacts
