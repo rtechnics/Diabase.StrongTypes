@@ -33,8 +33,12 @@ jobs:
       - name: Get version from tag
         id: get-version
         run: |
-          VERSION="$(git describe --tags --match "v*.*.*")"
-          echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
+          version="$(git describe --tags --match "v*.*.*")"
+          if [[ $version == *-* ]]; then
+            IFS='-' read -r -a parts <<< "$version"
+            version="${parts[0]}-alpha.${parts[1]}"
+          fi
+          echo "version=${version#v}" >> "$GITHUB_OUTPUT"
       - name: Set up dotnet CLI
         uses: actions/setup-dotnet@v6
         with:
