@@ -12,7 +12,7 @@
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder> 
 
     <PackageId>Diabase.StrongTypes.Generators</PackageId>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionPrefix>0.1.0-alpha.29</VersionPrefix>
     <Authors>R-Technics</Authors>
     <Description>Strong type source generator</Description>
     <PackageTags>sourcegenerator;roslyn;csharp</PackageTags>
