@@ -6,10 +6,7 @@
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Generators", ""))</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-
-    <!-- See setup-dotnet GitHub Actions workflow documentation -->
-    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder> 
-
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder> <!-- See setup-dotnet GitHub Actions workflow documentation -->
     <PackageId>Diabase.StrongTypes.Generators</PackageId>
     <VersionPrefix>0.1.1</VersionPrefix>
     <Authors>R-Technics</Authors>
@@ -17,6 +14,8 @@
     <PackageTags>sourcegenerator;roslyn;csharp</PackageTags>
     <RepositoryUrl>https://github.com/rtechnics/Diabase.StrongTypes</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking> <!-- Consumers do not need Microsoft.CodeAnalysis.*, and version conflicts occur with other frameworks such as ASP.NET -->
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzerToPackage</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -36,11 +35,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--
-    Entity Framework 10 requires exactly version 5.0.0 of the following tools. Updating this causes dependency issues, so leave it as-is.
-    -->
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +63,9 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!--
+  In its current state, rather than building the `Types` project separately, it bundles it in the same build as `Generators` by copying the source files. Ideally, we should use a more conventional approach, but it requires a lot of modifications. See the GitHub issue #12.
+  -->
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="cp -R '$(ProjectDir)../TemplateDesign/Templates/'* '$(ProjectDir)Templates/'" Condition="'$([MSBuild]::IsOSPlatform(&quot;OSX&quot;))' OR '$([MSBuild]::IsOSPlatform(&quot;Linux&quot;))'" />
     <Exec Command="cp -R '$(ProjectDir)../Types/'*.cs '$(ProjectDir)Types/'" Condition="'$([MSBuild]::IsOSPlatform(&quot;OSX&quot;))' OR '$([MSBuild]::IsOSPlatform(&quot;Linux&quot;))'" />
@@ -76,4 +75,14 @@
     <Exec Command="if not exist &quot;$(ProjectDir)Types\BytesSizeUnits&quot; mkdir &quot;$(ProjectDir)Types\BytesSizeUnits&quot; &amp; copy /Y &quot;$(ProjectDir)..\Types\BytesSizeUnits\*.cs&quot; &quot;$(ProjectDir)Types\BytesSizeUnits&quot;" Condition="'$([MSBuild]::IsOSPlatform(&quot;Windows&quot;))'" />
   </Target>
 
+  <!--
+  Nuget packages use `lib` for runtime dependencies and `analyzers` for analyzers. The DLL needs to go in both folders so that consumer projects correctly detect it as an analyzer and the Types project contents resolve at runtime.
+  -->
+  <Target Name="_AddAnalyzerToPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(TargetPath)">
+        <PackagePath>analyzers/dotnet/cs</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
 </Project>
