@@ -6,7 +6,6 @@
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Generators", ""))</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <RuntimeIdentifiers>android-arm64;ios-arm64;iossimulator-arm64;linux-arm64;linux-x64;osx;osx-arm64;osx-x64;win-arm64;win-x64</RuntimeIdentifiers>
 
     <!-- See setup-dotnet GitHub Actions workflow documentation -->
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder> 
@@ -37,8 +36,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <!--
+    Entity Framework 10 requires exactly version 5.0.0 of the following tools. Updating this causes dependency issues, so leave it as-is.
+    -->
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
