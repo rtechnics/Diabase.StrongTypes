@@ -21,7 +21,6 @@
       dotnet = {
         enable = true;
         package = pkgs.dotnetCorePackages."sdk_${config.languages.dotnet.packageSuffix}";
-        lsp.package = pkgs.omnisharp-roslyn;
       };
       nix.enable = true;
       shell.enable = true;
