@@ -200,6 +200,13 @@ namespace Diabase.StrongTypes.Templates
             {
                 writer.WriteStringValue(value.ToString());
             }
+
+
+            public override StrongValueId ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+                => BackingType.Parse(reader.GetString()!); // or int.Parse, depending on actual API
+
+            public override void WriteAsPropertyName(Utf8JsonWriter writer, StrongValueId value, JsonSerializerOptions options)
+                => writer.WritePropertyName(value.ToString()!);
 #endif
         }
 #endif
