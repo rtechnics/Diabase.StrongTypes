@@ -114,6 +114,9 @@
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
+      },
+      "diabase.strongtypes.types": {
+        "type": "Project"
       }
     }
   }

@@ -14,10 +14,9 @@
 
   <ItemGroup>
     <!-- <Compile Remove="$(CompilerGeneratedFilesOutputPath)/*/**/*.cs" /> -->
-    <ProjectReference Include="..\Generators\Diabase.StrongTypes.Generators.csproj" ReferenceOutputAssembly="true" OutputItemType="Analyzer" />
-    <!--
+    <ProjectReference Include="..\Generators\Diabase.StrongTypes.Generators.csproj"
+                      ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\Types\Diabase.StrongTypes.Types.csproj" />
-    -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="4.4.0" />
     <PackageReference Include="MSTest.TestFramework" Version="4.4.0" />
