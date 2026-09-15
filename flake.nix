@@ -70,9 +70,9 @@
             actions = import ./devenv.actions.nix;
           };
           packages = {
-            generators = pkgs.buildDotnetModule (
+            default = pkgs.buildDotnetModule (
               let
-                name = "Diabase.StrongTypes.Generators";
+                name = "Diabase.StrongTypes";
               in
               {
                 inherit name;
@@ -90,6 +90,7 @@
                   lockfiles = [
                     ./Generators/packages.lock.json
                     ./Tests/packages.lock.json
+                    ./Types/packages.lock.json
                   ];
                 };
               }

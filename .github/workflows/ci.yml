@@ -47,6 +47,8 @@ jobs:
           global-json-file: global.json
           cache: true
           cache-dependency-path: ./*/packages.lock.json
+          # We build Generators and its dependencies for the package, and
+          # Tests for tests. This workflow optimizes for those two cases.
       - name: Fetch dependencies
         run: |
           dotnet restore Generators --locked-mode
@@ -69,7 +71,7 @@ jobs:
             --no-build --configuration Release \
             --version-suffix "${{ steps.get-version.outputs.suffix }}" \
             --output "./dist/share/nuget/source/\
-              Diabase.StrongTypes.Generators/latest/"
+              Diabase.StrongTypes/latest/"
       - name: Upload package
         uses: actions/upload-artifact@v7
         with:

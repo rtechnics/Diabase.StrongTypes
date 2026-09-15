@@ -1,8 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
     <Platforms>AnyCPU;x64</Platforms>
+    <RootNamespace>Diabase.StrongTypes.Types</RootNamespace>
+
+    <!--
+    The runtime types are redistributed inside the Diabase.StrongTypes package that the Generators project builds,
+    so this project is not published on its own.
+    -->
+    <IsPackable>false</IsPackable>
+
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
 </Project>
