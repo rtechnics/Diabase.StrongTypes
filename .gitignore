@@ -357,3 +357,5 @@ result*
 
 # act (GitHub Actions runner)
 **/.artifacts
+/Generators/packages.lock.json
+/Types/packages.lock.json
